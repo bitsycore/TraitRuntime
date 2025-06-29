@@ -7,6 +7,7 @@
 #include <stdlib.h>
 
 #include "HashStr.h"
+#include "common/ErrorHandling.h"
 
 #define ENABLE_BUILTIN true
 
@@ -34,6 +35,7 @@ typedef struct {
 	HashStr name;
 	HashStr param_types[MAX_PARAMS_PER_METHODS];
 	size_t param_count;
+	size_t param_vararg_at;
 	struct Trait* trait;
 } Method;
 
@@ -94,9 +96,10 @@ Object* Object_newFrom(const Type* type, void* data);
 MethodImpl Object_getMethod(const Object* obj, HashStr trait_name, HashStr method_name);
 bool Object_is(const Object* obj, const Type* type);
 bool Object_implement(const Object* obj, const Trait* trait);
-void Object_finalize(Object* obj);
+void Object_destroy(Object* obj);
 void* Object_call(const Object* obj, const Method* method, ...);
-void* Object_callStr(const Object* obj, HashStr trait_name, HashStr method_name, ... );
+void* Object_callStrEx(const Object* obj, HashStr trait_name, HashStr method_name, ... );
+void* Object_callStr(const Object* obj, HashStr method_name, ... );
 Type* Object_getType(const Object* obj);
 
 // ======================================================================================
@@ -123,6 +126,12 @@ typedef struct {
 				Method* finalize;
 			} methods;
 		} Finalizable;
+		struct {
+			Trait* trait;
+			struct {
+				Method* construct;
+			} methods;
+		} Constructable;
 	} traits;
 } BuiltInStore;
 
@@ -180,7 +189,7 @@ extern BuiltInStore BuiltIn;
 #define TRAIT(...) TR____GET_TRAIT_MACRO(__VA_ARGS__, TR____TRAIT2, TR____TRAIT1)(__VA_ARGS__)
 
 #define DEF_PARAM(...) TR_____COUNT_ARGS(__VA_ARGS__) == 0 ? NULL : (HashStr[]){ TR___MAP(HASH_STR, __VA_ARGS__) }, TR_____COUNT_ARGS(__VA_ARGS__)
-
+#define PARAM_VA_MARK "__*_VAMARK_*__"
 #define TRAIT_ADD_METHOD(trait, method_name, ...) Trait_addMethod(trait, HASH_STR(method_name), DEF_PARAM(__VA_ARGS__))
 #define TRAIT_GET(trait_name) Trait_get(HASH_STR(trait_name))
 
@@ -190,32 +199,44 @@ extern BuiltInStore BuiltIn;
 #define TRAIT_IMPL_METHOD(traitImpl, methodName, fn) \
     TraitImpl_addMethod(traitImpl, Trait_getMethod(traitImpl->trait, HASH_STR(methodName)), fn)
 
-#define CALL(obj, traitName, methodName, ...) \
-	Object_callStr(obj, HASH_STR(traitName), HASH_STR(methodName) __VA_OPT__(,) __VA_ARGS__) \
+#define CALL(obj, methodName, ...) \
+	Object_callStr(obj, HASH_STR(methodName) __VA_OPT__(,) __VA_ARGS__) \
+
+#define CALL_EX(obj, traitName, methodName, ...) \
+	Object_callStrEx(obj, HASH_STR(traitName), HASH_STR(methodName) __VA_OPT__(,) __VA_ARGS__) \
 
 // =========================================
 // METHOD DEFINITION
 // =========================================
 
-#define METHOD_UNWRAP_START(objTypeName, traitTypeName, methodTypeName) \
+#define METHOD_UNWRAP_START() \
 	CTX->object->data; \
-	assert(HashStr_equal(&Type_getById(CTX->object->type_id)->name, &HASH_STR(objTypeName))); \
-	assert(HashStr_equal(&CTX->trait->name, &HASH_STR(traitTypeName))); \
-	assert(HashStr_equal(&CTX->method->name, &HASH_STR(methodTypeName))); \
 	unsigned int HIDDEN___count = 0\
 
-#define METHOD_UNWRAP_START_GENERIC(traitTypeName, methodTypeName) \
-	CTX->object->data; \
-	assert(HashStr_equal(&CTX->trait->name, &HASH_STR(traitTypeName))); \
-	assert(HashStr_equal(&CTX->method->name, &HASH_STR(methodTypeName))); \
-	unsigned int HIDDEN___count = 0\
+#define CHECK_TYPE(_type) \
+	EXIT_IF_NOT(Type_equal(Object_getType(CTX->object), _type), "Type \"%s\" called this method expecting type \"%s\"", Object_getType(CTX->object)->name.str, _type->name.str)
+#define CHECK_TRAIT(_trait) \
+	EXIT_IF_NOT(Trait_equal(CTX->trait, _trait), "Type \"%s\" called this method expecting type \"%s\"", CTX->trait->name.str, _trait->name.str)
+#define CHECK_METHOD(_method) \
+	EXIT_IF_NOT(HashStr_equal(&CTX->method->name, &_method->name), "Method \"%s\" called but this method expect \"%s\"", CTX->method->name.str, _method->name.str)
+#define CHECK_METHOD_STR(_methodName) \
+	EXIT_IF_NOT(HashStr_equal(&CTX->method->name, &HASH_STR(_methodName)), "Method \"%s\" called but this method expect \"%s\"", CTX->method->name.str, _methodName)
+
+#define CHECK_ALL(_type, _trait, _method) \
+	CHECK_TYPE(_type); CHECK_TRAIT(_trait); CHECK_METHOD(_method)
+
+#define CHECK_TYPE_STR(_typeName) CHECK_TYPE(Type_get(HASH_STR(_typeName)))
+#define CHECK_TRAIT_STR(_traitName) CHECK_TRAIT(Trait_get(HASH_STR(_traitName)))
+#define CHECK_ALL_STR(_typeName, _traitName, _methodName) CHECK_TYPE_STR(_typeName); CHECK_TRAIT_STR(_traitName); CHECK_METHOD_STR(_methodName)
 
 #define ARG_UNWRAP(type) \
 	va_arg(args, type); HIDDEN___count++;\
 	args = args/*Disable clang warn on clang mingw cause msvc require it to be not const*/ \
 
 #define METHOD_UNWRAP_END() \
-	assert(HIDDEN___count == CTX->method->param_count)
+	EXIT_IF(HIDDEN___count != CTX->method->param_count, \
+		"Arg count declarated for Method \"%s\" differt from param unwrapping count for impl of Type \"%s\"", \
+		CTX->method->name.str, Object_getType(CTX->object)->name.str)
 
 // =========================================
 // MACRO UTILITIES

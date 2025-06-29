@@ -45,6 +45,9 @@ void TraitRuntime_init(const bool enable_builtin) {
 	BuiltIn.traits.Finalizable.trait = TRAIT("Finalizable");
 	BuiltIn.traits.Finalizable.methods.finalize = Trait_addMethod(BuiltIn.traits.Finalizable.trait, HASH_STR("finalize"), DEF_PARAM());
 
+	BuiltIn.traits.Constructable.trait = TRAIT("Constructable");
+	BuiltIn.traits.Constructable.methods.construct = Trait_addMethod(BuiltIn.traits.Constructable.trait, HASH_STR("construct"), DEF_PARAM());
+
 	BuiltIn.types.UInt8 = TYPE("UInt8", uint8_t);
 	BuiltIn.types.UInt16 = TYPE("UInt16", uint16_t);
 	BuiltIn.types.UInt32 = TYPE("UInt32", uint32_t);
@@ -131,6 +134,24 @@ bool Type_implementById(const size_t id, const Trait* trait) {
 	return false;
 }
 
+TraitImpl* Type_getTraitImplMethod(const size_t type_id, const HashStr methodName) {
+
+	for (size_t i = 0; i < POOL_TRAIT_IMPL_COUNT; ++i) {
+		TraitImpl* impl = POOL_TRAIT_IMPL[i];
+		if (impl->type_id == type_id) {
+			for (size_t j = 0; j < impl->trait->method_count; ++j) {
+				const Method method = impl->trait->methods[j];
+				if (HashStr_equal(&method.name, &methodName)) {
+					return impl;
+				}
+			}
+		}
+	}
+
+	EXIT("No Implementation of Method \"%s\" found for Type \"%s\"", methodName.str, Type_getById(type_id)->name.str);
+	return NULL;
+}
+
 // =====================================
 // TRAIT
 // =====================================
@@ -172,10 +193,12 @@ Method* Trait_addMethod(Trait* trait, const HashStr method_name, const HashStr* 
 	Method* m = &trait->methods[trait->method_count++];
 	m->name = method_name;
 	m->param_count = param_count;
+	m->param_vararg_at = -1;
 	m->trait = (struct Trait*)trait;
-	for (size_t i = 0; i < param_count; ++i) {
-		if (param_types != NULL)
+	if (param_types != NULL) {
+		for (size_t i = 0; i < param_count; ++i) {
 			m->param_types[i] = param_types[i];
+		}
 	}
 
 	return m;
@@ -272,6 +295,9 @@ Object* Object_newFrom(const Type* type, void* data) {
 	Object* obj = malloc(sizeof(Object));
 	obj->type_id = type->id;
 	obj->data = data;
+	if (Object_implement(obj, BuiltIn.traits.Constructable.trait)) {
+		Object_call(obj, BuiltIn.traits.Constructable.methods.construct);
+	}
 	return obj;
 }
 
@@ -299,7 +325,21 @@ static void* INTERNAL_Object_call(const Object* obj, const Method* trait_method,
 	return trait_method_impl(ctx, args);
 }
 
-void* Object_callStr(const Object* obj, const HashStr trait_name, const HashStr method_name, ...) {
+void* Object_callStr(const Object* obj, const HashStr method_name, ...) {
+	EXIT_IF(obj == NULL, "param obj cannot be NULL");
+
+	const TraitImpl* trait_impl = Type_getTraitImplMethod(obj->type_id, method_name);
+	const Method* method = Trait_getMethod(trait_impl->trait, method_name);
+
+	va_list args;
+	va_start(args, method_name);
+	void* result = INTERNAL_Object_call(obj, method, trait_impl->trait, trait_impl, args);
+	va_end(args);
+
+	return result;
+}
+
+void* Object_callStrEx(const Object* obj, const HashStr trait_name, const HashStr method_name, ...) {
 	EXIT_IF(obj == NULL, "param obj cannot be NULL");
 
 	const Trait* trait = Trait_get(trait_name);
@@ -344,7 +384,7 @@ bool Object_implement(const Object* obj, const Trait* trait) {
 	return Type_implementById(obj->type_id, trait);
 }
 
-void Object_finalize(Object* obj) {
+void Object_destroy(Object* obj) {
 	if (obj == NULL) return;
 
 	if (Type_implementById(obj->type_id, BuiltIn.traits.Finalizable.trait)) {

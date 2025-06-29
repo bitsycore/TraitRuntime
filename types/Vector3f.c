@@ -3,6 +3,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#include "../common/ErrorHandling.h"
 #include "../traits/Format.h"
 #include "../traits/Move3f.h"
 
@@ -25,7 +26,8 @@ void Vector3f_initType() {
 }
 
 void* MethodImpl_Vector3f_Format_toString(const MethodContext* CTX, va_list args) {
-	const DataVector3f* this = METHOD_UNWRAP_START("Vector3f", "Format", "toString");
+	const DataVector3f* this = METHOD_UNWRAP_START();
+	CHECK_ALL_STR("Vector3f", "Format", "toString");
 	METHOD_UNWRAP_END();
 	const char* template = "%s(x=%f, y=%f, z=%f)";
 	const Type* type = Object_getType(CTX->object);
@@ -36,12 +38,11 @@ void* MethodImpl_Vector3f_Format_toString(const MethodContext* CTX, va_list args
 }
 
 void MethodImpl_Move3f_Vector3f_move(const MethodContext* CTX, va_list args) {
-	DataVector3f* this = METHOD_UNWRAP_START("Vector3f", "Move3f", "move");
-
+	DataVector3f* this = METHOD_UNWRAP_START();
+	CHECK_ALL_STR("Vector3f", "Move3f", "move");
 	const float deltaX = ARG_UNWRAP(double);
 	const float deltaY = ARG_UNWRAP(double);
 	const float deltaZ = ARG_UNWRAP(double);
-
 	METHOD_UNWRAP_END();
 
 	this->x += deltaX;
@@ -50,30 +51,27 @@ void MethodImpl_Move3f_Vector3f_move(const MethodContext* CTX, va_list args) {
 }
 
 void MethodImpl_Move3f_Vector3f_moveX(const MethodContext* CTX, va_list args) {
-	DataVector3f* this = METHOD_UNWRAP_START("Vector3f", "Move3f", "moveX");
-
+	DataVector3f* this = METHOD_UNWRAP_START();
+	CHECK_ALL_STR("Vector3f", "Move3f", "moveX");
 	const float deltaX = ARG_UNWRAP(double);
-
 	METHOD_UNWRAP_END();
 
 	this->x += deltaX;
 }
 
 void MethodImpl_Move3f_Vector3f_moveY(const MethodContext* CTX, va_list args) {
-	DataVector3f* this = METHOD_UNWRAP_START("Vector3f", "Move3f", "moveY");
-
+	DataVector3f* this = METHOD_UNWRAP_START();
+	CHECK_ALL_STR("Vector3f", "Move3f", "moveY");
 	const float deltaY = ARG_UNWRAP(double);
-
 	METHOD_UNWRAP_END();
 
 	this->y += deltaY;
 }
 
 void MethodImpl_Move3f_Vector3f_moveZ(const MethodContext* CTX, va_list args) {
-	DataVector3f* this = METHOD_UNWRAP_START("Vector3f", "Move3f", "moveZ");
-
+	DataVector3f* this = METHOD_UNWRAP_START();
+	CHECK_ALL_STR("Vector3f", "Move3f", "moveZ");
 	const float deltaZ = ARG_UNWRAP(double);
-
 	METHOD_UNWRAP_END();
 
 	this->z += deltaZ;

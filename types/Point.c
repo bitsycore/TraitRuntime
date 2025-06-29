@@ -3,10 +3,31 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#include "../Log.h"
 #include "../traits/Format.h"
 #include "../traits/Move2i.h"
 
 Type* type_Point;
+
+// ===========================================================
+// Impl Finalizable
+// ===========================================================
+
+void Point_MethodImpl_Finalizable_finalize(const MethodContext* CTX) {
+	METHOD_UNWRAP_START();
+	CHECK_TRAIT_STR("Finalizable");
+	CHECK_METHOD_STR("finalize");
+	METHOD_UNWRAP_END();
+	LOG("%s got finalized\n", Type_getById(CTX->object->type_id)->name.str);
+}
+
+void Point_MethodImpl_Constructable_construct(const MethodContext* CTX, va_list args) {
+	METHOD_UNWRAP_START();
+	CHECK_TRAIT_STR("Constructable");
+	CHECK_METHOD_STR("construct");
+	METHOD_UNWRAP_END();
+	LOG("%s got constructed\n", Type_getById(CTX->object->type_id)->name.str);
+}
 
 // ===========================================================
 // METHODS
@@ -24,6 +45,9 @@ void Point_initType(void) {
 
 	TraitImpl* traitImpl_Finalizable_Point = TraitImpl_create(BuiltIn.traits.Finalizable.trait, type_Point);
 	TraitImpl_addMethod(traitImpl_Finalizable_Point, BuiltIn.traits.Finalizable.methods.finalize, Point_MethodImpl_Finalizable_finalize);
+
+	TraitImpl* traitImpl_Constructable_Point = TraitImpl_create(BuiltIn.traits.Constructable.trait, type_Point);
+	TraitImpl_addMethod(traitImpl_Constructable_Point, BuiltIn.traits.Constructable.methods.construct, Point_MethodImpl_Constructable_construct);
 }
 
 // ===========================================================
@@ -31,8 +55,10 @@ void Point_initType(void) {
 // ===========================================================
 
 void* Point_MethodImpl_Format_toString(const MethodContext* CTX, va_list args) {
-	const DataPoint* this = METHOD_UNWRAP_START("Point", "Format", "toString");
+	const DataPoint* this =	METHOD_UNWRAP_START();
+	CHECK_ALL(type_Point, trait_Format, method_Format_toString);
 	METHOD_UNWRAP_END();
+
 	const int len = snprintf(NULL, 0, "%s(x=%d, y=%d)", Type_getById(CTX->object->type_id)->name.str, this->x, this->y);
 	char* buf = malloc(len + 1);
 	snprintf(buf, len + 1, "%s(x=%d, y=%d)", Type_getById(CTX->object->type_id)->name.str, this->x, this->y);
@@ -40,25 +66,14 @@ void* Point_MethodImpl_Format_toString(const MethodContext* CTX, va_list args) {
 }
 
 // ===========================================================
-// Impl Finalizable
-// ===========================================================
-
-void Point_MethodImpl_Finalizable_finalize(const MethodContext* CTX, va_list args) {
-	METHOD_UNWRAP_START_GENERIC("Finalizable", "finalize");
-	METHOD_UNWRAP_END();
-	printf("%s got freed", Type_getById(CTX->object->type_id)->name.str);
-}
-
-// ===========================================================
 // Impl Move2i
 // ===========================================================
 
 void Point_MethodImpl_Move2i_move(const MethodContext* CTX, va_list args) {
-	DataPoint* this = METHOD_UNWRAP_START("Point", "Move2i", "move");
-
+	DataPoint* this = METHOD_UNWRAP_START();
+	CHECK_ALL(type_Point, trait_Move2i, method_Move2i_move);
 	const int deltaX = ARG_UNWRAP(int);
 	const int deltaY = ARG_UNWRAP(int);
-
 	METHOD_UNWRAP_END();
 
 	this->x += deltaX;
@@ -66,20 +81,18 @@ void Point_MethodImpl_Move2i_move(const MethodContext* CTX, va_list args) {
 }
 
 void Point_MethodImpl_Move2i_moveX(const MethodContext* CTX, va_list args) {
-	DataPoint* this = METHOD_UNWRAP_START("Point", "Move2i", "moveX");
-
+	DataPoint* this = METHOD_UNWRAP_START();
+	CHECK_ALL_STR("Point", "Move2i", "moveX");
 	const int deltaX = ARG_UNWRAP(int);
-
 	METHOD_UNWRAP_END();
 
 	this->x += deltaX;
 }
 
 void Point_MethodImpl_Move2i_moveY(const MethodContext* CTX, va_list args) {
-	DataPoint* this = METHOD_UNWRAP_START("Point", "Move2i", "moveY");
-
+	DataPoint* this = METHOD_UNWRAP_START();
+	CHECK_ALL_STR("Point", "Move2i", "moveY");
 	const int deltaY = ARG_UNWRAP(int);
-
 	METHOD_UNWRAP_END();
 
 	this->y += deltaY;

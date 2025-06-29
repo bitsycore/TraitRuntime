@@ -13,7 +13,7 @@ void Point_initType(void);
 
 void* Point_MethodImpl_Format_toString(const MethodContext* CTX, va_list args);
 
-void Point_MethodImpl_Finalizable_finalize(const MethodContext* CTX, va_list args);
+void Point_MethodImpl_Finalizable_finalize(const MethodContext* CTX);
 
 void Point_MethodImpl_Move2i_move(const MethodContext* CTX, va_list args);
 void Point_MethodImpl_Move2i_moveX(const MethodContext* CTX, va_list args);
