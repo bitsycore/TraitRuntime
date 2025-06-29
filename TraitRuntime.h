@@ -111,21 +111,47 @@ extern Trait* trait_Finalizable;
 extern Method* method_Finalizable_finalize;
 
 // ======================================================================================
-// MACRO UTILS
+// MACRO PRIVATE UTILS
 // ======================================================================================
+
+#define TR___MAP0(m,x1)
+#define TR___MAP1(m,x1,...) m(x1), TR___MAP0(m,__VA_ARGS__)
+#define TR___MAP2(m,x1,...) m(x1), TR___MAP1(m,__VA_ARGS__)
+#define TR___MAP3(m,x1,...) m(x1), TR___MAP2(m,__VA_ARGS__)
+#define TR___MAP4(m,x1,...) m(x1), TR___MAP3(m,__VA_ARGS__)
+#define TR___MAP5(m,x1,...) m(x1), TR___MAP4(m,__VA_ARGS__)
+#define TR___MAP6(m,x1,...) m(x1), TR___MAP5(m,__VA_ARGS__)
+#define TR___MAP7(m,x1,...) m(x1), TR___MAP6(m,__VA_ARGS__)
+#define TR___MAP8(m,x1,...) m(x1), TR___MAP7(m,__VA_ARGS__)
+#define TR___MAP9(m,x1,...) m(x1), TR___MAP8(m,__VA_ARGS__)
+#define TR___MAP10(m,x1,...) m(x1), TR___MAP9(m,__VA_ARGS__)
+#define TR___MAP11(m,x1,...) m(x1), TR___MAP10(m,__VA_ARGS__)
+#define TR___MAP12(m,x1,...) m(x1), TR___MAP11(m,__VA_ARGS__)
+#define TR___MAP13(m,x1,...) m(x1), TR___MAP12(m,__VA_ARGS__)
+#define TR___MAP14(m,x1,...) m(x1), TR___MAP13(m,__VA_ARGS__)
+#define TR___MAP15(m,x1,...) m(x1), TR___MAP14(m,__VA_ARGS__)
+#define TR___MAP16(m,x1,...) m(x1), TR___MAP15(m,__VA_ARGS__)
+#define TR___MAP17(m,x1,...) m(x1), TR___MAP16(m,__VA_ARGS__)
+#define TR___MAP18(m,x1,...) m(x1), TR___MAP17(m,__VA_ARGS__)
+#define TR___MAP19(m,x1,...) m(x1), TR___MAP18(m,__VA_ARGS__)
+#define TR___MAP20(m,x1,...) m(x1), TR___MAP19(m,__VA_ARGS__)
+
+#define TR___GET_MACRO(_0,_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12,_13,_14,_15,_16, _17,_18,_19,_20,NAME,...) NAME
+
+#define TR___MAP(m, ...) TR___GET_MACRO(__VA_ARGS__, \
+	TR___MAP20, TR___MAP19, TR___MAP18, TR___MAP17, TR___MAP16, TR___MAP15, \
+	TR___MAP14, TR___MAP13, TR___MAP12, TR___MAP11, TR___MAP10, TR___MAP9, TR___MAP8, \
+	TR___MAP7, TR___MAP6, TR___MAP5, TR___MAP4, TR___MAP3, TR___MAP2, TR___MAP1, TR___MAP0 \
+)(m, __VA_ARGS__)
 
 #define TR_____COUNT_ARGS(...) TR_____COUNT_ARGS_(,##__VA_ARGS__,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0)
 #define TR_____COUNT_ARGS_(z,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,cnt,...) cnt
 
-#define USE(T, trait_name) \
-	for (T * it = trait_name; it != NULL; it = NULL)
+#define USE(T, traitName) for (T * it = traitName; it != NULL; it = NULL)
 
 // =========================================
 // METHOD DEFINITION
 // =========================================
-
-#define DEF_PARAM(...) \
-    (HashStr[]){ __VA_ARGS__ }, TR_____COUNT_ARGS(__VA_ARGS__)
 
 #define TYPE(name, data) \
 	Type_create(HASH_STR(name), sizeof(data))
@@ -133,33 +159,26 @@ extern Method* method_Finalizable_finalize;
 #define TRAIT(name) \
 	Trait_create(HASH_STR(name))
 
-#define TRAIT_IMPL(trait, type_name) \
-	TraitImpl_create(Trait_get(HASH_STR(trait)), Type_get(HASH_STR(type_name)))
+#define DEF_PARAM(...) TR_____COUNT_ARGS(__VA_ARGS__) == 0 ? NULL : (HashStr[]){ TR___MAP(HASH_STR, __VA_ARGS__) }, TR_____COUNT_ARGS(__VA_ARGS__)
 
-#define PARAM(name) \
-    HASH_STR(name)
+#define TRAIT_IMPL(traitName, typeName) \
+	TraitImpl_create(Trait_get(HASH_STR(traitName)), Type_get(HASH_STR(typeName)))
 
-#define TRAIT_ADD_METHOD(trait, method_name, ...) ({ \
-    HashStr _params[] = { __VA_ARGS__ }; \
-    size_t _count = sizeof(_params) / sizeof(HashStr); \
-    Trait_addMethod(trait, HASH_STR(method_name), _params, _count); \
-})
+#define TRAIT_IMPL_METHOD(traitImpl, methodName, fn) \
+    TraitImpl_addMethod(traitImpl, Trait_getMethod(traitImpl->trait, HASH_STR(methodName)), fn)
 
-#define TRAIT_IMPL_METHOD(trait_impl, method, fn) \
-    TraitImpl_addMethod(trait_impl, Trait_getMethod(trait_impl->trait, HASH_STR(method)), fn)
-
-#define CALL(obj, trait_name, method_name, ...) \
-	Object_callStr(obj, HASH_STR(trait_name), HASH_STR(method_name) __VA_OPT__(, )__VA_ARGS__) \
+#define CALL(obj, traitName, methodName, ...) \
+	Object_callStr(obj, HASH_STR(traitName), HASH_STR(methodName) __VA_OPT__(,) __VA_ARGS__) \
 
 // =========================================
 // METHOD DEFINITION
 // =========================================
 
-#define METHOD_UNWRAP_START(obj_type_name, trait_type_name, method_type_name) \
+#define METHOD_UNWRAP_START(objTypeName, traitTypeName, methodTypeName) \
 	CTX->object->data; \
-	assert(HashStr_equal(&CTX->object->type->name, &HASH_STR(obj_type_name))); \
-	assert(HashStr_equal(&CTX->trait->name, &HASH_STR(trait_type_name))); \
-	assert(HashStr_equal(&CTX->method->name, &HASH_STR(method_type_name))); \
+	assert(HashStr_equal(&CTX->object->type->name, &HASH_STR(objTypeName))); \
+	assert(HashStr_equal(&CTX->trait->name, &HASH_STR(traitTypeName))); \
+	assert(HashStr_equal(&CTX->method->name, &HASH_STR(methodTypeName))); \
 	unsigned int HIDDEN___count = 0\
 
 #define ARG_UNWRAP(type) \
