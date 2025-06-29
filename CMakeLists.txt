@@ -6,6 +6,6 @@ set(CMAKE_C_STANDARD 11)
 add_executable(TraitRuntime main.c
         trait_runtime.c
         trait_runtime.h
-        hashed_str.c
-        hashed_str.h
+        hash_str.c
+        hash_str.h
 )

@@ -7,7 +7,7 @@
 typedef struct {
   uint32_t hash;
   const char *str;
-} HashedStr;
+} HashStr;
 
 #define FNV1A_32_PRIME 16777619u
 #define FNV1A_32_BASIS 2166136261u
@@ -19,9 +19,9 @@ static uint32_t fnv1a_32(const char *str, const size_t len) {
   return hash;
 }
 
-bool hashed_str_eq(const HashedStr *a, const HashedStr *b);
+bool hashed_str_eq(const HashStr *a, const HashStr *b);
 
 #define HASH_STR(s)                                                            \
-  ((HashedStr){.hash = fnv1a_32(s, sizeof(s) / sizeof(s[0])), .str = s})
+  ((HashStr){.hash = fnv1a_32(s, sizeof(s) / sizeof(s[0])), .str = s})
 
 #endif // HASHED_STR_H
