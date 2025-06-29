@@ -24,6 +24,6 @@ add_executable(TraitRuntime
         common/Debug.h
 )
 
-if (MSVC)
+if (MSVC AND CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_link_libraries(TraitRuntime PRIVATE Dbghelp)
 endif()

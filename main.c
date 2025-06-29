@@ -100,7 +100,6 @@ void do_work(void) {
 int main() {
 	const clock_t start = clock();
 
-
 	// =====================================================================
 	// Init Runtime
 	TRAIT_RUNTIME_INIT();
