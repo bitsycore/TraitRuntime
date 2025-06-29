@@ -12,7 +12,7 @@ typedef struct {
 	int x, y;
 } DataPoint;
 
-void* MethodImpl_Point_Display_toString(const MethodContext* CTX, va_list args) {
+void* MethodImpl_Display_Point_toString(const MethodContext* CTX, va_list args) {
 	const DataPoint* this = METHOD_UNWRAP_START("Point", "Display", "toString");
 	METHOD_UNWRAP_END();
 	const int len = snprintf(NULL, 0, "%s(x=%d, y=%d)", CTX->object->type->name.str, this->x, this->y);
@@ -21,7 +21,13 @@ void* MethodImpl_Point_Display_toString(const MethodContext* CTX, va_list args) 
 	return buf;
 }
 
-void MethodImpl_Point_Move2i_move(const MethodContext* CTX, const va_list args) {
+void MethodImpl_Finalizable_Point_finalize(const MethodContext* CTX, va_list args) {
+	METHOD_UNWRAP_START("Point", "Finalizable", "finalize");
+	METHOD_UNWRAP_END();
+	printf("%s\n got freed", CTX->object->type->name.str);
+}
+
+void MethodImpl_Move2i_Point_move(const MethodContext* CTX, const va_list args) {
 	DataPoint* this = METHOD_UNWRAP_START("Point", "Move2i", "move");
 
 	const int deltaX = ARG_UNWRAP(int);
@@ -33,7 +39,7 @@ void MethodImpl_Point_Move2i_move(const MethodContext* CTX, const va_list args) 
 	this->y += deltaY;
 }
 
-void MethodImpl_Point_Move2i_moveX(const MethodContext* CTX, const va_list args) {
+void MethodImpl_Move2i_Point_moveX(const MethodContext* CTX, const va_list args) {
 	DataPoint* this = METHOD_UNWRAP_START("Point", "Move2i", "moveX");
 
 	const int deltaX = ARG_UNWRAP(int);
@@ -43,7 +49,7 @@ void MethodImpl_Point_Move2i_moveX(const MethodContext* CTX, const va_list args)
 	this->x += deltaX;
 }
 
-void MethodImpl_Point_Move2i_moveY(const MethodContext* CTX, const va_list args) {
+void MethodImpl_Move2i_Point_moveY(const MethodContext* CTX, const va_list args) {
 	DataPoint* this = METHOD_UNWRAP_START("Point", "Move2i", "moveY");
 
 	const int deltaY = ARG_UNWRAP(int);
@@ -71,7 +77,7 @@ void* MethodImpl_Vector3f_Display_toString(const MethodContext* CTX, va_list arg
 	return buf;
 }
 
-void MethodImpl_Vector3f_Move3f_move(const MethodContext* CTX, const va_list args) {
+void MethodImpl_Move3f_Vector3f_move(const MethodContext* CTX, const va_list args) {
 	DataVector3f* this = METHOD_UNWRAP_START("Vector3f", "Move3f", "move");
 
 	const float deltaX = ARG_UNWRAP(double);
@@ -85,7 +91,7 @@ void MethodImpl_Vector3f_Move3f_move(const MethodContext* CTX, const va_list arg
 	this->z += deltaZ;
 }
 
-void MethodImpl_Vector3f_Move3f_moveX(const MethodContext* CTX, const va_list args) {
+void MethodImpl_Move3f_Vector3f_moveX(const MethodContext* CTX, const va_list args) {
 	DataVector3f* this = METHOD_UNWRAP_START("Vector3f", "Move3f", "moveX");
 
 	const float deltaX = ARG_UNWRAP(double);
@@ -95,7 +101,7 @@ void MethodImpl_Vector3f_Move3f_moveX(const MethodContext* CTX, const va_list ar
 	this->x += deltaX;
 }
 
-void MethodImpl_Vector3f_Move3f_moveY(const MethodContext* CTX, const va_list args) {
+void MethodImpl_Move3f_Vector3f_moveY(const MethodContext* CTX, const va_list args) {
 	DataVector3f* this = METHOD_UNWRAP_START("Vector3f", "Move3f", "moveY");
 
 	const float deltaY = ARG_UNWRAP(double);
@@ -105,7 +111,7 @@ void MethodImpl_Vector3f_Move3f_moveY(const MethodContext* CTX, const va_list ar
 	this->y += deltaY;
 }
 
-void MethodImpl_Vector3f_Move3f_moveZ(const MethodContext* CTX, const va_list args) {
+void MethodImpl_Move3f_Vector3f_moveZ(const MethodContext* CTX, const va_list args) {
 	DataVector3f* this = METHOD_UNWRAP_START("Vector3f", "Move3f", "moveZ");
 
 	const float deltaZ = ARG_UNWRAP(double);
@@ -126,7 +132,7 @@ void Display_print(const Object* this) {
 // UINT64
 // ===========================================================
 
-void* MethodImpl_UInt64_Display_toString(const MethodContext* CTX, va_list args) {
+void* MethodImpl_Display_UInt64_toString(const MethodContext* CTX, va_list args) {
 	const uint64_t this = *(uint64_t*) METHOD_UNWRAP_START("UInt64", "Display", "toString");
 	METHOD_UNWRAP_END();
 	const char* template = "%s(%llu)";
@@ -168,13 +174,16 @@ int main() {
 	// Impl Traits for Point
 	TraitImpl* traitImpl_Display_Point = TRAIT_IMPL("Display", "Point");
 	USE(TraitImpl, traitImpl_Display_Point) {
-		TraitImpl_addMethod(it, method_Display_toString, MethodImpl_Point_Display_toString);
+		TraitImpl_addMethod(it, method_Display_toString, MethodImpl_Display_Point_toString);
 	}
 
-	TraitImpl* traitImpl_Point_Move2i = TRAIT_IMPL("Move2i", "Point");
-	TRAIT_IMPL_METHOD(traitImpl_Point_Move2i, "move", MethodImpl_Point_Move2i_move);
-	TRAIT_IMPL_METHOD(traitImpl_Point_Move2i, "moveX", MethodImpl_Point_Move2i_moveX);
-	TRAIT_IMPL_METHOD(traitImpl_Point_Move2i, "moveY", MethodImpl_Point_Move2i_moveY);
+	TraitImpl* traitImpl_Move2i_Point = TRAIT_IMPL("Move2i", "Point");
+	TRAIT_IMPL_METHOD(traitImpl_Move2i_Point, "move", MethodImpl_Move2i_Point_move);
+	TRAIT_IMPL_METHOD(traitImpl_Move2i_Point, "moveX", MethodImpl_Move2i_Point_moveX);
+	TRAIT_IMPL_METHOD(traitImpl_Move2i_Point, "moveY", MethodImpl_Move2i_Point_moveY);
+
+	TraitImpl* traitImpl_Finalizable_Point = TraitImpl_create(Finalizable, type_Point);
+	TRAIT_IMPL_METHOD(traitImpl_Finalizable_Point, "finalize", MethodImpl_Finalizable_Point_finalize);
 
 	// =====================================================================
 	// Impl Traits for Vector3F
@@ -182,15 +191,15 @@ int main() {
 	TRAIT_IMPL_METHOD(traitImpl_Display_Vector3f, "toString", MethodImpl_Vector3f_Display_toString);
 
 	TraitImpl* traitImpl_Move3f_Vector3f = TraitImpl_create(trait_Move3f, type_Vector3f);
-	TRAIT_IMPL_METHOD(traitImpl_Move3f_Vector3f, "move", MethodImpl_Vector3f_Move3f_move);
-	TRAIT_IMPL_METHOD(traitImpl_Move3f_Vector3f, "moveX", MethodImpl_Vector3f_Move3f_moveX);
-	TRAIT_IMPL_METHOD(traitImpl_Move3f_Vector3f, "moveY", MethodImpl_Vector3f_Move3f_moveY);
-	TRAIT_IMPL_METHOD(traitImpl_Move3f_Vector3f, "moveZ", MethodImpl_Vector3f_Move3f_moveZ);
+	TRAIT_IMPL_METHOD(traitImpl_Move3f_Vector3f, "move", MethodImpl_Move3f_Vector3f_move);
+	TRAIT_IMPL_METHOD(traitImpl_Move3f_Vector3f, "moveX", MethodImpl_Move3f_Vector3f_moveX);
+	TRAIT_IMPL_METHOD(traitImpl_Move3f_Vector3f, "moveY", MethodImpl_Move3f_Vector3f_moveY);
+	TRAIT_IMPL_METHOD(traitImpl_Move3f_Vector3f, "moveZ", MethodImpl_Move3f_Vector3f_moveZ);
 
 	// =====================================================================
 	// Impl Traits for Uint64
 	TraitImpl* traitImpl_Display_UInt64 = TraitImpl_create(trait_Display, UInt64);
-	TRAIT_IMPL_METHOD(traitImpl_Display_UInt64, "toString", MethodImpl_UInt64_Display_toString);
+	TRAIT_IMPL_METHOD(traitImpl_Display_UInt64, "toString", MethodImpl_Display_UInt64_toString);
 
 	// =====================================================================
 	// Create Object
@@ -241,6 +250,7 @@ int main() {
 
 	Object_finalize(point);
 	Object_finalize(vector3f);
+	Object_finalize(uint64);
 
 	TraitRuntime_clean();
 	return 0;

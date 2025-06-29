@@ -22,6 +22,9 @@ Type* Int64;
 Type* Float32;
 Type* Float64;
 
+Trait* Finalizable;
+Method* Finalizable_finalize;
+
 // =====================================
 // GENERAL
 // =====================================
@@ -43,6 +46,9 @@ void TraitRuntime_init() {
     memset(POOL_TYPE, 0, sizeof(POOL_TRAIT_IMPL));
     memset(POOL_TRAIT, 0, sizeof(POOL_TRAIT_IMPL));
     memset(POOL_TRAIT_IMPL, 0, sizeof(POOL_TRAIT_IMPL));
+
+    Finalizable = TRAIT("Finalizable");
+    Finalizable_finalize = TRAIT_ADD_METHOD(Finalizable, "finalize");
 
     UInt8  = TYPE("UInt8", uint8_t);
     UInt16 = TYPE("UInt16", uint16_t);
@@ -88,6 +94,7 @@ Type* Type_get(const HashStr name) {
         }
     }
     assert(!"<Type> not found");
+    return NULL;
 }
 
 bool type_eq(const Type* this, const Type* other) {
@@ -158,6 +165,7 @@ Method* Trait_getMethod(const Trait* trait, const HashStr method_name) {
             return (Method*)m;
     }
     assert(!"<TraitMethod> not found in <Trait>");
+    return NULL;
 }
 
 // =====================================
@@ -193,9 +201,10 @@ TraitImpl* TraitImpl_get(const Type* type, const Trait* trait) {
         }
     }
     assert(!"No implementation of <Trait> found for this <Type>");
+    return NULL;
 }
 
-MethodImpl MethodImpl_get(const TraitImpl* impl, const HashStr method_name) {
+MethodImpl TraitImpl_getMethodImpl(const TraitImpl* impl, const HashStr method_name) {
     for (size_t j = 0; j < impl->trait->method_count; ++j) {
         if (hashed_str_eq(&impl->trait->methods[j].name, &method_name) == true) {
             const MethodImpl method_impl = impl->methods[j];
@@ -204,6 +213,7 @@ MethodImpl MethodImpl_get(const TraitImpl* impl, const HashStr method_name) {
         }
     }
     assert(!"<TraitImplMethod> not found for <TraitImpl>");
+    return NULL;
 }
 
 // =====================================
@@ -228,11 +238,11 @@ Object* Object_new(Type* type) {
 MethodImpl Object_getMethod(const Object* obj, const HashStr trait_name, const HashStr method_name) {
     const Trait* trait = Trait_get(trait_name);
     const TraitImpl * impl = TraitImpl_get(obj->type, trait);
-    return MethodImpl_get(impl, method_name);
+    return TraitImpl_getMethodImpl(impl, method_name);
 }
 
 void* INTERNAL_Object_call(const Object* obj, const Method* trait_method, const Trait* trait, const TraitImpl* trait_impl, va_list args) {
-    const MethodImpl trait_method_impl = MethodImpl_get(trait_impl, trait_method->name);
+    const MethodImpl trait_method_impl = TraitImpl_getMethodImpl(trait_impl, trait_method->name);
     const MethodContext ctx = (MethodContext){obj, trait, trait_method};
     return trait_method_impl(ctx, args);
 }
@@ -267,6 +277,11 @@ bool Object_is(const Object* obj, const Type* type) {
 }
 
 void Object_finalize(Object* obj) {
+
+    if (Type_implement(obj->type, Finalizable)) {
+        Object_call(obj, Finalizable_finalize);
+    }
+
     free(obj->data);
     free(obj);
 }

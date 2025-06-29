@@ -74,6 +74,8 @@ bool Trait_equal(const Trait* this, const Trait* other);
 // TraitImpl
 TraitImpl* TraitImpl_create(Trait* trait, Type* type);
 void TraitImpl_addMethod(TraitImpl* trait_impl, const Method* method, MethodImpl method_impl);
+TraitImpl* TraitImpl_get(const Type* type, const Trait* trait);
+MethodImpl TraitImpl_getMethodImpl(const TraitImpl* impl, HashStr method_name);
 
 // ===================================
 // Object
@@ -102,6 +104,9 @@ extern Type* Int64;
 extern Type* Float32;
 extern Type* Float64;
 
+extern Trait* Finalizable;
+extern Method* Finalizable_finalize;
+
 // ======================================================================================
 // MARK: SUGAR MACRO
 // ======================================================================================
@@ -118,10 +123,10 @@ extern Type* Float64;
 #define PARAM(name) \
     HASH_STR(name)
 
-#define TRAIT_ADD_METHOD(trait, method, ...) ({ \
+#define TRAIT_ADD_METHOD(trait, method_name, ...) ({ \
     HashStr _params[] = { __VA_ARGS__ }; \
     size_t _count = sizeof(_params) / sizeof(HashStr); \
-    Trait_addMethod(trait, HASH_STR(method), _params, _count); \
+    Trait_addMethod(trait, HASH_STR(method_name), _params, _count); \
 })
 
 #define TRAIT_IMPL_METHOD(trait_impl, method, fn) \
