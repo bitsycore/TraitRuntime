@@ -123,7 +123,7 @@ int main() {
 
 	const clock_t end = clock();
 	const double time_spent = (double)(end - start) / CLOCKS_PER_SEC;
-	printf("Init Runtime took %.100f ms\n", time_spent * 1000.0f);
+	printf("Init Runtime took %.5f ms\n", time_spent * 1000.0f);
 
 	const clock_t start2 = clock();
 	// =====================================================================

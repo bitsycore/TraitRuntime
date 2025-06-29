@@ -84,7 +84,7 @@ bool Trait_equal(const Trait* this, const Trait* other);
 // TraitImpl
 TraitImpl* TraitImpl_create(Trait* trait, Type* type);
 void TraitImpl_addMethod(TraitImpl* trait_impl, const Method* method, MethodImpl method_impl);
-TraitImpl* TraitImpl_get(const size_t type_id, const Trait* trait);
+TraitImpl* TraitImpl_get(size_t type_id, const Trait* trait);
 MethodImpl TraitImpl_getMethodImpl(const TraitImpl* trait_impl, HashStr method_name);
 
 // ===================================
@@ -174,10 +174,10 @@ extern BuiltInStore BuiltIn;
 #define TYPE(name, data) \
 	Type_create(HASH_STR(name), sizeof(data))
 
-#define GET_TRAIT_MACRO(_1, _2, NAME, ...) NAME
-#define TRAIT1(name) Trait_create(HASH_STR(name), 0)
-#define TRAIT2(name, type) Trait_create(HASH_STR(name), sizeof(type))
-#define TRAIT(...) GET_TRAIT_MACRO(__VA_ARGS__, TRAIT2, TRAIT1)(__VA_ARGS__)
+#define TR____GET_TRAIT_MACRO(_1, _2, NAME, ...) NAME
+#define TR____TRAIT1(name) Trait_create(HASH_STR(name), 0)
+#define TR____TRAIT2(name, type) Trait_create(HASH_STR(name), sizeof(type))
+#define TRAIT(...) TR____GET_TRAIT_MACRO(__VA_ARGS__, TR____TRAIT2, TR____TRAIT1)(__VA_ARGS__)
 
 #define DEF_PARAM(...) TR_____COUNT_ARGS(__VA_ARGS__) == 0 ? NULL : (HashStr[]){ TR___MAP(HASH_STR, __VA_ARGS__) }, TR_____COUNT_ARGS(__VA_ARGS__)
 

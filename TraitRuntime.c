@@ -307,7 +307,7 @@ void* Object_callStr(const Object* obj, const HashStr trait_name, const HashStr 
 	const Method* trait_method = Trait_getMethod(trait, method_name);
 
 	va_list args;
-	va_start(args, trait_method->param_count);
+	va_start(args, method_name);
 	void* result = INTERNAL_Object_call(obj, trait_method, trait, trait_impl, args);
 	va_end(args);
 
@@ -322,7 +322,7 @@ void* Object_call(const Object* obj, const Method* method, ...) {
 	const TraitImpl* trait_impl = TraitImpl_get(obj->type_id, trait);
 
 	va_list args;
-	va_start(args, method->param_count);
+	va_start(args, method);
 	void* result = INTERNAL_Object_call(obj, method, trait, trait_impl, args);
 	va_end(args);
 

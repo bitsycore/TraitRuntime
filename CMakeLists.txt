@@ -3,7 +3,8 @@ project(TraitRuntime C)
 
 set(CMAKE_C_STANDARD 11)
 
-add_executable(TraitRuntime main.c
+add_executable(TraitRuntime
+        main.c
         TraitRuntime.c
         TraitRuntime.h
         HashStr.c
@@ -22,3 +23,7 @@ add_executable(TraitRuntime main.c
         common/Debug.c
         common/Debug.h
 )
+
+if (MSVC)
+    target_link_libraries(TraitRuntime PRIVATE Dbghelp)
+endif()
