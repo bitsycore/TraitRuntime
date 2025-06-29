@@ -25,7 +25,7 @@ void Vector3f_initType() {
 	TraitImpl_addMethod(traitImpl_Move3f_Vector3f, method_Move3f_moveZ, MethodImpl_Move3f_Vector3f_moveZ);
 }
 
-void* MethodImpl_Vector3f_Format_toString(const MethodContext* CTX, va_list args) {
+void* MethodImpl_Vector3f_Format_toString(MethodContext* CTX) {
 	const DataVector3f* this = METHOD_UNWRAP_START();
 	CHECK_ALL_STR("Vector3f", "Format", "toString");
 	METHOD_UNWRAP_END();
@@ -37,7 +37,7 @@ void* MethodImpl_Vector3f_Format_toString(const MethodContext* CTX, va_list args
 	return buf;
 }
 
-void MethodImpl_Move3f_Vector3f_move(const MethodContext* CTX, va_list args) {
+void* MethodImpl_Move3f_Vector3f_move(MethodContext* CTX) {
 	DataVector3f* this = METHOD_UNWRAP_START();
 	CHECK_ALL_STR("Vector3f", "Move3f", "move");
 	const float deltaX = ARG_UNWRAP(double);
@@ -48,31 +48,39 @@ void MethodImpl_Move3f_Vector3f_move(const MethodContext* CTX, va_list args) {
 	this->x += deltaX;
 	this->y += deltaY;
 	this->z += deltaZ;
+
+	return NULL;
 }
 
-void MethodImpl_Move3f_Vector3f_moveX(const MethodContext* CTX, va_list args) {
+void* MethodImpl_Move3f_Vector3f_moveX(MethodContext* CTX) {
 	DataVector3f* this = METHOD_UNWRAP_START();
 	CHECK_ALL_STR("Vector3f", "Move3f", "moveX");
 	const float deltaX = ARG_UNWRAP(double);
 	METHOD_UNWRAP_END();
 
 	this->x += deltaX;
+
+	return NULL;
 }
 
-void MethodImpl_Move3f_Vector3f_moveY(const MethodContext* CTX, va_list args) {
+void* MethodImpl_Move3f_Vector3f_moveY(MethodContext* CTX) {
 	DataVector3f* this = METHOD_UNWRAP_START();
 	CHECK_ALL_STR("Vector3f", "Move3f", "moveY");
 	const float deltaY = ARG_UNWRAP(double);
 	METHOD_UNWRAP_END();
 
 	this->y += deltaY;
+
+	return NULL;
 }
 
-void MethodImpl_Move3f_Vector3f_moveZ(const MethodContext* CTX, va_list args) {
+void* MethodImpl_Move3f_Vector3f_moveZ(MethodContext* CTX) {
 	DataVector3f* this = METHOD_UNWRAP_START();
 	CHECK_ALL_STR("Vector3f", "Move3f", "moveZ");
 	const float deltaZ = ARG_UNWRAP(double);
 	METHOD_UNWRAP_END();
 
 	this->z += deltaZ;
+
+	return NULL;
 }

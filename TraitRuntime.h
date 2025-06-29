@@ -50,9 +50,10 @@ typedef struct {
 	const Object* object;
 	const Trait* trait;
 	const Method* method;
+	va_list args;
 } MethodContext;
 
-typedef void* (*MethodImpl)(MethodContext CTX, va_list argv);
+typedef void* (*MethodImpl)(MethodContext* CTX);
 
 typedef struct {
 	size_t type_id;
@@ -230,8 +231,8 @@ extern BuiltInStore BuiltIn;
 #define CHECK_ALL_STR(_typeName, _traitName, _methodName) CHECK_TYPE_STR(_typeName); CHECK_TRAIT_STR(_traitName); CHECK_METHOD_STR(_methodName)
 
 #define ARG_UNWRAP(type) \
-	va_arg(args, type); HIDDEN___count++;\
-	args = args/*Disable clang warn on clang mingw cause msvc require it to be not const*/ \
+	va_arg(CTX->args, type); HIDDEN___count++;\
+	CTX->args = CTX->args/*Disable clang warn on clang mingw cause msvc require it to be not const*/ \
 
 #define METHOD_UNWRAP_END() \
 	EXIT_IF(HIDDEN___count != CTX->method->param_count, \

@@ -25,7 +25,7 @@ void Format_print(const Object* this) {
 // UINT64
 // ===========================================================
 
-void* MethodImpl_Format_UInt64_toString(const MethodContext* CTX) {
+void* MethodImpl_Format_UInt64_toString(MethodContext* CTX) {
 	const uint64_t this = *(uint64_t*) METHOD_UNWRAP_START();
 	CHECK_ALL_STR("UInt64", "Format", "toString");
 	METHOD_UNWRAP_END();

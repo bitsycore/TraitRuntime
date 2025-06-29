@@ -320,9 +320,9 @@ static void* INTERNAL_Object_call(const Object* obj, const Method* trait_method,
 	EXIT_IF(trait_impl == NULL, "param trait impl cannot be NULL");
 
 	const MethodImpl trait_method_impl = TraitImpl_getMethodImpl(trait_impl, trait_method->name);
-	const MethodContext ctx = (MethodContext){obj, trait, trait_method};
+	MethodContext ctx = (MethodContext){obj, trait, trait_method, args};
 
-	return trait_method_impl(ctx, args);
+	return trait_method_impl(&ctx);
 }
 
 void* Object_callStr(const Object* obj, const HashStr method_name, ...) {

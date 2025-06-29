@@ -13,20 +13,22 @@ Type* type_Point;
 // Impl Finalizable
 // ===========================================================
 
-void Point_MethodImpl_Finalizable_finalize(const MethodContext* CTX) {
+void* Point_MethodImpl_Finalizable_finalize(MethodContext* CTX) {
 	METHOD_UNWRAP_START();
 	CHECK_TRAIT_STR("Finalizable");
 	CHECK_METHOD_STR("finalize");
 	METHOD_UNWRAP_END();
 	LOG("%s got finalized\n", Type_getById(CTX->object->type_id)->name.str);
+	return NULL;
 }
 
-void Point_MethodImpl_Constructable_construct(const MethodContext* CTX, va_list args) {
+void* Point_MethodImpl_Constructable_construct(MethodContext* CTX) {
 	METHOD_UNWRAP_START();
 	CHECK_TRAIT_STR("Constructable");
 	CHECK_METHOD_STR("construct");
 	METHOD_UNWRAP_END();
 	LOG("%s got constructed\n", Type_getById(CTX->object->type_id)->name.str);
+	return NULL;
 }
 
 // ===========================================================
@@ -54,7 +56,7 @@ void Point_initType(void) {
 // Impl Format
 // ===========================================================
 
-void* Point_MethodImpl_Format_toString(const MethodContext* CTX, va_list args) {
+void* Point_MethodImpl_Format_toString(MethodContext* CTX) {
 	const DataPoint* this =	METHOD_UNWRAP_START();
 	CHECK_ALL(type_Point, trait_Format, method_Format_toString);
 	METHOD_UNWRAP_END();
@@ -69,7 +71,7 @@ void* Point_MethodImpl_Format_toString(const MethodContext* CTX, va_list args) {
 // Impl Move2i
 // ===========================================================
 
-void Point_MethodImpl_Move2i_move(const MethodContext* CTX, va_list args) {
+void* Point_MethodImpl_Move2i_move(MethodContext* CTX) {
 	DataPoint* this = METHOD_UNWRAP_START();
 	CHECK_ALL(type_Point, trait_Move2i, method_Move2i_move);
 	const int deltaX = ARG_UNWRAP(int);
@@ -78,22 +80,28 @@ void Point_MethodImpl_Move2i_move(const MethodContext* CTX, va_list args) {
 
 	this->x += deltaX;
 	this->y += deltaY;
+
+	return NULL;
 }
 
-void Point_MethodImpl_Move2i_moveX(const MethodContext* CTX, va_list args) {
+void* Point_MethodImpl_Move2i_moveX(MethodContext* CTX) {
 	DataPoint* this = METHOD_UNWRAP_START();
 	CHECK_ALL_STR("Point", "Move2i", "moveX");
 	const int deltaX = ARG_UNWRAP(int);
 	METHOD_UNWRAP_END();
 
 	this->x += deltaX;
+
+	return NULL;
 }
 
-void Point_MethodImpl_Move2i_moveY(const MethodContext* CTX, va_list args) {
+void* Point_MethodImpl_Move2i_moveY(MethodContext* CTX) {
 	DataPoint* this = METHOD_UNWRAP_START();
 	CHECK_ALL_STR("Point", "Move2i", "moveY");
 	const int deltaY = ARG_UNWRAP(int);
 	METHOD_UNWRAP_END();
 
 	this->y += deltaY;
+
+	return NULL;
 }
