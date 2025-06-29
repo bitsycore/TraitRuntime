@@ -1,5 +1,4 @@
 #include <assert.h>
-#include <stdarg.h>
 #include <stdio.h>
 
 #include "TraitRuntime.h"
@@ -39,7 +38,7 @@ void* MethodImpl_Format_UInt64_toString(const MethodContext* CTX, va_list args) 
 int main() {
 	// =====================================================================
 	// Init Runtime
-	TraitRuntime_init();
+	TRAIT_RUNTIME_INIT();
 
 	// =====================================================================
 	// Create Traits
@@ -54,7 +53,7 @@ int main() {
 
 	// =====================================================================
 	// Impl Traits for Uint64
-	TraitImpl* traitImpl_Format_UInt64 = TraitImpl_create(trait_Format, UInt64);
+	TraitImpl* traitImpl_Format_UInt64 = TraitImpl_create(trait_Format, BuiltIn.types.UInt64);
 	TraitImpl_addMethod(traitImpl_Format_UInt64, method_Format_toString, MethodImpl_Format_UInt64_toString);
 
 	// =====================================================================
@@ -77,7 +76,7 @@ int main() {
 
 	LINE_BREAK();
 
-	Object* instance_uint64 = Object_new(UInt64);
+	Object* instance_uint64 = Object_new(BuiltIn.types.UInt64);
 	*(uint64_t*)instance_uint64->data = 512;
 	printf("Object is of type: %s\n", instance_uint64->type->name.str);
 	printf("Object data size: %zu\n", instance_uint64->type->size);
@@ -119,6 +118,7 @@ int main() {
 
 	// =====================================================================
 	// Clean Runtime
+	TraitRuntime_clean();
 	TraitRuntime_clean();
 	return 0;
 }

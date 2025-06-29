@@ -1,5 +1,8 @@
 #include "Vector3f.h"
 
+#include <stdarg.h>
+#include <stdio.h>
+
 #include "../traits/Format.h"
 #include "../traits/Move3f.h"
 

@@ -3,6 +3,10 @@
 
 #include "../TraitRuntime.h"
 
+typedef struct {
+	float x, y, z;
+} Move3fData;
+
 extern Trait* trait_Move3f;
 extern Method* method_Move3f_move;
 extern Method* method_Move3f_moveX;

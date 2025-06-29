@@ -18,4 +18,7 @@ add_executable(TraitRuntime main.c
         traits/Move2i.h
         traits/Move3f.c
         traits/Move3f.h
+        common/ErrorHandling.h
+        common/Debug.c
+        common/Debug.h
 )

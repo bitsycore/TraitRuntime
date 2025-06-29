@@ -8,12 +8,16 @@
 
 #include "HashStr.h"
 
-#define MAX_TRAITS 16
-#define MAX_TRAIT_IMPLS 16
-#define MAX_TYPE 16
+#define ENABLE_BUILTIN true
+
+#define MAX_TRAITS 32
+#define MAX_TRAIT_IMPLS 32
+#define MAX_TYPE 32
 
 #define MAX_METHODS_PER_TRAITS 8
 #define MAX_PARAMS_PER_METHODS 8
+
+struct Trait;
 
 typedef struct {
 	HashStr name;
@@ -24,8 +28,6 @@ typedef struct {
 	Type* type;
 	void* data;
 } Object;
-
-struct Trait;
 
 typedef struct {
 	HashStr name;
@@ -38,6 +40,7 @@ typedef struct {
 	HashStr name;
 	Method methods[MAX_METHODS_PER_TRAITS];
 	size_t method_count;
+	size_t data_size;
 } Trait;
 
 typedef struct {
@@ -56,7 +59,7 @@ typedef struct {
 
 // ===================================
 // General
-void TraitRuntime_init();
+void TraitRuntime_init(bool enable_builtin);
 void TraitRuntime_clean();
 
 // ===================================
@@ -64,10 +67,11 @@ void TraitRuntime_clean();
 Type* Type_create(HashStr name, size_t size);
 Type* Type_get(HashStr name);
 bool Type_implement(const Type* type, const Trait* trait);
+bool Type_equal(const Type* this, const Type* other);
 
 // ===================================
 // Trait
-Trait* Trait_create(HashStr name);
+Trait* Trait_create(HashStr name, size_t data_size);
 Trait* Trait_get(HashStr name);
 Method* Trait_addMethod(Trait* trait, HashStr method_name, const HashStr* param_types, size_t param_count);
 Method* Trait_getMethod(const Trait* trait, HashStr method_name);
@@ -78,7 +82,7 @@ bool Trait_equal(const Trait* this, const Trait* other);
 TraitImpl* TraitImpl_create(Trait* trait, Type* type);
 void TraitImpl_addMethod(TraitImpl* trait_impl, const Method* method, MethodImpl method_impl);
 TraitImpl* TraitImpl_get(const Type* type, const Trait* trait);
-MethodImpl TraitImpl_getMethodImpl(const TraitImpl* impl, HashStr method_name);
+MethodImpl TraitImpl_getMethodImpl(const TraitImpl* trait_impl, HashStr method_name);
 
 // ===================================
 // Object
@@ -86,6 +90,7 @@ Object* Object_new(Type* type);
 Object* Object_newFrom(Type* type, void* data);
 MethodImpl Object_getMethod(const Object* obj, HashStr trait_name, HashStr method_name);
 bool Object_is(const Object* obj, const Type* type);
+bool Object_implement(const Object* obj, const Trait* trait);
 void Object_finalize(Object* obj);
 void* Object_call(const Object* obj, const Method* method, ...);
 void* Object_callStr(const Object* obj, HashStr trait_name, HashStr method_name, ... );
@@ -94,21 +99,30 @@ void* Object_callStr(const Object* obj, HashStr trait_name, HashStr method_name,
 // BUILT IN TYPE
 // ======================================================================================
 
-extern Type* UInt8;
-extern Type* UInt16;
-extern Type* UInt32;
-extern Type* UInt64;
+typedef struct {
+	struct {
+		Type* UInt8;
+		Type* UInt16;
+		Type* UInt32;
+		Type* UInt64;
+		Type* Int8;
+		Type* Int16;
+		Type* Int32;
+		Type* Int64;
+		Type* Float32;
+		Type* Float64;
+	} types;
+	struct {
+		struct {
+			Trait* trait;
+			struct {
+				Method* finalize;
+			} methods;
+		} Finalizable;
+	} traits;
+} BuiltInStore;
 
-extern Type* Int8;
-extern Type* Int16;
-extern Type* Int32;
-extern Type* Int64;
-
-extern Type* Float32;
-extern Type* Float64;
-
-extern Trait* trait_Finalizable;
-extern Method* method_Finalizable_finalize;
+extern BuiltInStore BuiltIn;
 
 // ======================================================================================
 // MACRO PRIVATE UTILS
@@ -147,19 +161,24 @@ extern Method* method_Finalizable_finalize;
 #define TR_____COUNT_ARGS(...) TR_____COUNT_ARGS_(,##__VA_ARGS__,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0)
 #define TR_____COUNT_ARGS_(z,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,cnt,...) cnt
 
-#define USE(T, traitName) for (T * it = traitName; it != NULL; it = NULL)
+// =========================================
+// SUGAR
+// =========================================
 
-// =========================================
-// METHOD DEFINITION
-// =========================================
+#define TRAIT_RUNTIME_INIT() TraitRuntime_init(ENABLE_BUILTIN)
 
 #define TYPE(name, data) \
 	Type_create(HASH_STR(name), sizeof(data))
 
-#define TRAIT(name) \
-	Trait_create(HASH_STR(name))
+#define GET_TRAIT_MACRO(_1, _2, NAME, ...) NAME
+#define TRAIT1(name) Trait_create(HASH_STR(name), 0)
+#define TRAIT2(name, type) Trait_create(HASH_STR(name), sizeof(type))
+#define TRAIT(...) GET_TRAIT_MACRO(__VA_ARGS__, TRAIT2, TRAIT1)(__VA_ARGS__)
 
 #define DEF_PARAM(...) TR_____COUNT_ARGS(__VA_ARGS__) == 0 ? NULL : (HashStr[]){ TR___MAP(HASH_STR, __VA_ARGS__) }, TR_____COUNT_ARGS(__VA_ARGS__)
+
+#define TRAIT_ADD_METHOD(trait, method_name, ...) Trait_addMethod(trait, HASH_STR(method_name), DEF_PARAM(__VA_ARGS__))
+#define TRAIT_GET(trait_name) Trait_get(HASH_STR(trait_name))
 
 #define TRAIT_IMPL(traitName, typeName) \
 	TraitImpl_create(Trait_get(HASH_STR(traitName)), Type_get(HASH_STR(typeName)))
@@ -182,9 +201,16 @@ extern Method* method_Finalizable_finalize;
 	unsigned int HIDDEN___count = 0\
 
 #define ARG_UNWRAP(type) \
-	va_arg(args, type); HIDDEN___count++
+	va_arg(args, type); HIDDEN___count++;\
+	args = args/*Disable clang warn on clang mingw cause msvc require it to be not const*/ \
 
 #define METHOD_UNWRAP_END() \
 	assert(HIDDEN___count == CTX->method->param_count)
+
+// =========================================
+// MACRO UTILITIES
+// =========================================
+
+#define USE(T, traitName) for (T * it = traitName; it != NULL; it = NULL)
 
 #endif

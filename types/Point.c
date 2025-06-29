@@ -1,5 +1,8 @@
 #include "Point.h"
 
+#include <stdarg.h>
+#include <stdio.h>
+
 #include "../traits/Format.h"
 #include "../traits/Move2i.h"
 
@@ -19,8 +22,8 @@ void Point_initType(void) {
 	TRAIT_IMPL_METHOD(traitImpl_Move2i_Point, "moveX", Point_MethodImpl_Move2i_moveX);
 	TRAIT_IMPL_METHOD(traitImpl_Move2i_Point, "moveY", Point_MethodImpl_Move2i_moveY);
 
-	TraitImpl* traitImpl_Finalizable_Point = TraitImpl_create(trait_Finalizable, type_Point);
-	TraitImpl_addMethod(traitImpl_Finalizable_Point, method_Finalizable_finalize, Point_MethodImpl_Finalizable_finalize);
+	TraitImpl* traitImpl_Finalizable_Point = TraitImpl_create(BuiltIn.traits.Finalizable.trait, type_Point);
+	TraitImpl_addMethod(traitImpl_Finalizable_Point, BuiltIn.traits.Finalizable.methods.finalize, Point_MethodImpl_Finalizable_finalize);
 }
 
 // ===========================================================
