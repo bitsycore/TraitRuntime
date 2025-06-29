@@ -4,8 +4,18 @@ project(TraitRuntime C)
 set(CMAKE_C_STANDARD 11)
 
 add_executable(TraitRuntime main.c
-        trait_runtime.c
-        trait_runtime.h
-        hash_str.c
-        hash_str.h
+        TraitRuntime.c
+        TraitRuntime.h
+        HashStr.c
+        HashStr.h
+        types/Point.c
+        types/Point.h
+        types/Vector3f.c
+        types/Vector3f.h
+        traits/Format.c
+        traits/Format.h
+        traits/Move2i.c
+        traits/Move2i.h
+        traits/Move3f.c
+        traits/Move3f.h
 )

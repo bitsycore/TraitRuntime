@@ -1,4 +1,4 @@
-#include "trait_runtime.h"
+#include "TraitRuntime.h"
 
 #include <assert.h>
 #include <stdarg.h>
@@ -22,8 +22,8 @@ Type* Int64;
 Type* Float32;
 Type* Float64;
 
-Trait* Finalizable;
-Method* Finalizable_finalize;
+Trait* trait_Finalizable;
+Method* method_Finalizable_finalize;
 
 // =====================================
 // GENERAL
@@ -47,8 +47,8 @@ void TraitRuntime_init() {
     memset(POOL_TRAIT, 0, sizeof(POOL_TRAIT_IMPL));
     memset(POOL_TRAIT_IMPL, 0, sizeof(POOL_TRAIT_IMPL));
 
-    Finalizable = TRAIT("Finalizable");
-    Finalizable_finalize = TRAIT_ADD_METHOD(Finalizable, "finalize");
+    trait_Finalizable = TRAIT("Finalizable");
+    method_Finalizable_finalize = Trait_addMethod(trait_Finalizable, HASH_STR("finalize"), NULL, 0);
 
     UInt8  = TYPE("UInt8", uint8_t);
     UInt16 = TYPE("UInt16", uint16_t);
@@ -89,7 +89,7 @@ Type* Type_create(const HashStr name, const size_t size) {
 
 Type* Type_get(const HashStr name) {
     for (size_t i = 0; i < POOL_TYPE_COUNT; ++i) {
-        if (hashed_str_eq(&POOL_TYPE[i]->name, &name) == true) {
+        if (HashStr_equal(&POOL_TYPE[i]->name, &name) == true) {
             return POOL_TYPE[i];
         }
     }
@@ -99,7 +99,7 @@ Type* Type_get(const HashStr name) {
 
 bool type_eq(const Type* this, const Type* other) {
     if (this == other) return true;
-    if (hashed_str_eq(&this->name, &other->name)) return true;
+    if (HashStr_equal(&this->name, &other->name)) return true;
     return false;
 }
 
@@ -131,19 +131,19 @@ Trait* Trait_create(const HashStr name) {
 
 Trait* Trait_get(const HashStr name) {
     for (size_t i = 0; i < POOL_TRAIT_COUNT; ++i)
-        if (hashed_str_eq(&POOL_TRAIT[i]->name, &name) == true)
+        if (HashStr_equal(&POOL_TRAIT[i]->name, &name) == true)
             return POOL_TRAIT[i];
     return NULL;
 }
 
 bool Trait_equal(const Trait* this, const Trait* other) {
     if (this == other) return true;
-    if (hashed_str_eq(&this->name, &other->name)) return true;
+    if (HashStr_equal(&this->name, &other->name)) return true;
     return false;
 }
 
 Method* Trait_addMethod(Trait* trait, const HashStr method_name, const HashStr* param_types, const size_t param_count) {
-    assert(trait->method_count < MAX_METHODS);
+    assert(trait->method_count < MAX_METHODS_PER_TRAITS);
     Method* m = &trait->methods[trait->method_count++];
     m->name = method_name;
     m->param_count = param_count;
@@ -159,9 +159,9 @@ Method* Trait_addMethod(Trait* trait, const HashStr method_name, const HashStr* 
 
 Method* Trait_getMethod(const Trait* trait, const HashStr method_name) {
     const Trait* impl = trait;
-    for (size_t j = 0; j < MAX_METHODS; ++j) {
+    for (size_t j = 0; j < MAX_METHODS_PER_TRAITS; ++j) {
         const Method* m = &impl->methods[j];
-        if (hashed_str_eq(&m->name, &method_name) == true)
+        if (HashStr_equal(&m->name, &method_name) == true)
             return (Method*)m;
     }
     assert(!"<TraitMethod> not found in <Trait>");
@@ -185,7 +185,7 @@ TraitImpl* TraitImpl_create(Trait* trait, Type* type) {
 void TraitImpl_addMethod(TraitImpl* trait_impl, const Method* method, const MethodImpl method_impl) {
     if (Trait_equal(trait_impl->trait, (Trait*) method->trait))
     for (size_t i = 0; i < trait_impl->trait->method_count; ++i) {
-        if (hashed_str_eq(&trait_impl->trait->methods[i].name, &method->name) == true) {
+        if (HashStr_equal(&trait_impl->trait->methods[i].name, &method->name) == true) {
             trait_impl->methods[i] = method_impl;
             return;
         }
@@ -206,7 +206,7 @@ TraitImpl* TraitImpl_get(const Type* type, const Trait* trait) {
 
 MethodImpl TraitImpl_getMethodImpl(const TraitImpl* impl, const HashStr method_name) {
     for (size_t j = 0; j < impl->trait->method_count; ++j) {
-        if (hashed_str_eq(&impl->trait->methods[j].name, &method_name) == true) {
+        if (HashStr_equal(&impl->trait->methods[j].name, &method_name) == true) {
             const MethodImpl method_impl = impl->methods[j];
             if (method_impl == NULL) break;
             return method_impl;
@@ -241,7 +241,7 @@ MethodImpl Object_getMethod(const Object* obj, const HashStr trait_name, const H
     return TraitImpl_getMethodImpl(impl, method_name);
 }
 
-void* INTERNAL_Object_call(const Object* obj, const Method* trait_method, const Trait* trait, const TraitImpl* trait_impl, va_list args) {
+static void* INTERNAL_Object_call(const Object* obj, const Method* trait_method, const Trait* trait, const TraitImpl* trait_impl, va_list args) {
     const MethodImpl trait_method_impl = TraitImpl_getMethodImpl(trait_impl, trait_method->name);
     const MethodContext ctx = (MethodContext){obj, trait, trait_method};
     return trait_method_impl(ctx, args);
@@ -273,13 +273,13 @@ void* Object_call(const Object* obj, const Method* method, ...) {
 }
 
 bool Object_is(const Object* obj, const Type* type) {
-    return hashed_str_eq(&obj->type->name,  &type->name);
+    return HashStr_equal(&obj->type->name,  &type->name);
 }
 
 void Object_finalize(Object* obj) {
 
-    if (Type_implement(obj->type, Finalizable)) {
-        Object_call(obj, Finalizable_finalize);
+    if (Type_implement(obj->type, trait_Finalizable)) {
+        Object_call(obj, method_Finalizable_finalize);
     }
 
     free(obj->data);

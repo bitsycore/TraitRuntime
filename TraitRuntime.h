@@ -1,16 +1,19 @@
 #ifndef TRAIT_RUNTIME_H
 #define TRAIT_RUNTIME_H
 
+#include <assert.h>
+#include <stdarg.h>
+#include <stdio.h>
 #include <stdlib.h>
 
-#include "hash_str.h"
-
-#define MAX_METHODS 16
-#define MAX_PARAMS 16
+#include "HashStr.h"
 
 #define MAX_TRAITS 16
 #define MAX_TRAIT_IMPLS 16
 #define MAX_TYPE 16
+
+#define MAX_METHODS_PER_TRAITS 8
+#define MAX_PARAMS_PER_METHODS 8
 
 typedef struct {
 	HashStr name;
@@ -26,14 +29,14 @@ struct Trait;
 
 typedef struct {
 	HashStr name;
-	HashStr param_types[MAX_PARAMS];
+	HashStr param_types[MAX_PARAMS_PER_METHODS];
 	size_t param_count;
 	struct Trait* trait;
 } Method;
 
 typedef struct {
 	HashStr name;
-	Method methods[MAX_METHODS];
+	Method methods[MAX_METHODS_PER_TRAITS];
 	size_t method_count;
 } Trait;
 
@@ -48,7 +51,7 @@ typedef void* (*MethodImpl)(MethodContext CTX, va_list argv);
 typedef struct {
 	Type* type;
 	Trait* trait;
-	MethodImpl methods[MAX_METHODS];
+	MethodImpl methods[MAX_METHODS_PER_TRAITS];
 } TraitImpl;
 
 // ===================================
@@ -104,12 +107,25 @@ extern Type* Int64;
 extern Type* Float32;
 extern Type* Float64;
 
-extern Trait* Finalizable;
-extern Method* Finalizable_finalize;
+extern Trait* trait_Finalizable;
+extern Method* method_Finalizable_finalize;
 
 // ======================================================================================
-// MARK: SUGAR MACRO
+// MACRO UTILS
 // ======================================================================================
+
+#define TR_____COUNT_ARGS(...) TR_____COUNT_ARGS_(,##__VA_ARGS__,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0)
+#define TR_____COUNT_ARGS_(z,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,cnt,...) cnt
+
+#define USE(T, trait_name) \
+	for (T * it = trait_name; it != NULL; it = NULL)
+
+// =========================================
+// METHOD DEFINITION
+// =========================================
+
+#define DEF_PARAM(...) \
+    (HashStr[]){ __VA_ARGS__ }, TR_____COUNT_ARGS(__VA_ARGS__)
 
 #define TYPE(name, data) \
 	Type_create(HASH_STR(name), sizeof(data))
@@ -133,7 +149,7 @@ extern Method* Finalizable_finalize;
     TraitImpl_addMethod(trait_impl, Trait_getMethod(trait_impl->trait, HASH_STR(method)), fn)
 
 #define CALL(obj, trait_name, method_name, ...) \
-	Object_callStr(obj, HASH_STR(trait_name), HASH_STR(method_name) __VA_OPT__(, )__VA_ARGS__); \
+	Object_callStr(obj, HASH_STR(trait_name), HASH_STR(method_name) __VA_OPT__(, )__VA_ARGS__) \
 
 // =========================================
 // METHOD DEFINITION
@@ -141,9 +157,9 @@ extern Method* Finalizable_finalize;
 
 #define METHOD_UNWRAP_START(obj_type_name, trait_type_name, method_type_name) \
 	CTX->object->data; \
-	assert(hashed_str_eq(&CTX->object->type->name, &HASH_STR(obj_type_name))); \
-	assert(hashed_str_eq(&CTX->trait->name, &HASH_STR(trait_type_name))); \
-	assert(hashed_str_eq(&CTX->method->name, &HASH_STR(method_type_name))); \
+	assert(HashStr_equal(&CTX->object->type->name, &HASH_STR(obj_type_name))); \
+	assert(HashStr_equal(&CTX->trait->name, &HASH_STR(trait_type_name))); \
+	assert(HashStr_equal(&CTX->method->name, &HASH_STR(method_type_name))); \
 	unsigned int HIDDEN___count = 0\
 
 #define ARG_UNWRAP(type) \
@@ -151,12 +167,5 @@ extern Method* Finalizable_finalize;
 
 #define METHOD_UNWRAP_END() \
 	assert(HIDDEN___count == CTX->method->param_count)
-
-// =========================================
-// UTILITIES
-// =========================================
-
-#define USE(T, trait_name) \
-	for (T * it = trait_name; it != NULL; it = NULL)
 
 #endif

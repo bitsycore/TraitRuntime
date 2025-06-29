@@ -1,9 +1,9 @@
-#include "hash_str.h"
+#include "HashStr.h"
 
 #include <stdbool.h>
 #include <string.h>
 
-bool hashed_str_eq(const HashStr *a, const HashStr *b) {
+bool HashStr_equal(const HashStr *a, const HashStr *b) {
   if (a == b)
     return true;
   if (a->hash != b->hash)

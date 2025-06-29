@@ -19,7 +19,7 @@ static uint32_t fnv1a_32(const char *str, const size_t len) {
   return hash;
 }
 
-bool hashed_str_eq(const HashStr *a, const HashStr *b);
+bool HashStr_equal(const HashStr *a, const HashStr *b);
 
 #define HASH_STR(s)                                                            \
   ((HashStr){.hash = fnv1a_32(s, sizeof(s) / sizeof(s[0])), .str = s})
