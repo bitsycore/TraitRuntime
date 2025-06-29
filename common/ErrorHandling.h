@@ -74,13 +74,13 @@
     exit(EXIT_FAILURE); \
 } while (0)
 
-#define EXIT_IF(expr, msg) do { \
+#define EXIT_IF(expr, msg, ...) do { \
     if ((expr)) { \
         char* callstack__ = print_call_stack();\
         if(callstack__ == NULL || callstack__[0] == '\n')\
-            fprintf(stderr, "\n----- [ERROR] -----\nExpression: %s\nInfo: %s\nFile: %s:%d\nFunction: %s\n-------------------\n", ERR_HANDLING___STRINGIFY(expr), msg, __FILE__, __LINE__, __func__); \
+            fprintf(stderr, "\n----- [ERROR] -----\nExpression: %s\nInfo: " msg "\nFile: %s:%d\nFunction: %s\n-------------------\n", ERR_HANDLING___STRINGIFY(expr), __VA_ARGS__ __VA_OPT__(,) __FILE__, __LINE__, __func__); \
         else \
-            fprintf(stderr, "\n----- [ERROR] -----\nExpression: %s\nInfo: %s\nFile: %s:%d\nFunction: %s\nCallstack\n%s-------------------\n", ERR_HANDLING___STRINGIFY(expr), msg, __FILE__, __LINE__, __func__, callstack__); \
+            fprintf(stderr, "\n----- [ERROR] -----\nExpression: %s\nInfo: " msg "\nFile: %s:%d\nFunction: %s\nCallstack\n%s-------------------\n", ERR_HANDLING___STRINGIFY(expr), __VA_ARGS__ __VA_OPT__(,)  __FILE__, __LINE__, __func__, callstack__); \
         free(callstack__); \
         exit(EXIT_FAILURE); \
     } \
@@ -130,18 +130,18 @@ if ((expected) == (actual)) { \
 
 #include <assert.h>
 
-#define WARN(msg)
-#define WARN_FORMAT(msg, ...)
-#define WARN_IF(expr, msg)
-#define WARN_IF_NOT(expr, msg)
-#define WARN_IF_EQUAL(expected, actual, msg)
-#define WARN_IF_NOT_EQUAL(expected, actual, msg)
+#define WARN(...)
+#define WARN_FORMAT(...)
+#define WARN_IF(...)
+#define WARN_IF_NOT(...)
+#define WARN_IF_EQUAL(...)
+#define WARN_IF_NOT_EQUAL(...)
 
-#define EXIT(msg)
-#define EXIT_IF(expr, msg)
-#define EXIT_IF_NOT(expr, msg)
-#define EXIT_IF_NOT_EQUAL(expected, actual, msg)
-#define EXIT_IF_EQUAL(expected, actual, msg)
+#define EXIT(...)
+#define EXIT_IF(...)
+#define EXIT_IF_NOT(...)
+#define EXIT_IF_NOT_EQUAL(...)
+#define EXIT_IF_EQUAL(...)
 
 #endif // NDEBUG
 

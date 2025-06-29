@@ -39,6 +39,9 @@ void TraitRuntime_init(const bool enable_builtin) {
 
 	if (enable_builtin == false) return;
 
+	// ==============================================
+	// LOAD ALL BUILT IN TYPES AND TRAIT
+
 	BuiltIn.traits.Finalizable.trait = TRAIT("Finalizable");
 	BuiltIn.traits.Finalizable.methods.finalize = Trait_addMethod(BuiltIn.traits.Finalizable.trait, HASH_STR("finalize"), DEF_PARAM());
 
@@ -81,6 +84,7 @@ Type* Type_create(const HashStr name, const size_t size) {
 	Type* t = malloc(sizeof(Type));
 	t->name = name;
 	t->size = size;
+	t->id = POOL_TYPE_COUNT;
 	POOL_TYPE[POOL_TYPE_COUNT++] = t;
 
 	return t;
@@ -96,6 +100,11 @@ Type* Type_get(const HashStr name) {
 	return NULL;
 }
 
+Type* Type_getById(const size_t id) {
+	EXIT_IF(id >= POOL_TYPE_COUNT, "Can't find type with id %zu", id);
+	return POOL_TYPE[id];
+}
+
 bool Type_equal(const Type* this, const Type* other) {
 	if (this == other) return true;
 	if (HashStr_equal(&this->name, &other->name)) return true;
@@ -104,12 +113,17 @@ bool Type_equal(const Type* this, const Type* other) {
 
 bool Type_implement(const Type* type, const Trait* trait) {
 	if (type == NULL || trait == NULL) return false;
+	return Type_implementById(type->id, trait);
+}
+
+bool Type_implementById(const size_t id, const Trait* trait) {
+	if (trait == NULL) return false;
 
 	for (size_t i = 0; i < POOL_TRAIT_IMPL_COUNT; ++i) {
 		const TraitImpl* impl = POOL_TRAIT_IMPL[i];
 		if (
 			Trait_equal(impl->trait, trait) &&
-			Type_equal(impl->type, type)
+			impl->type_id == id
 		) {
 			return true;
 		}
@@ -195,7 +209,7 @@ TraitImpl* TraitImpl_create(Trait* trait, Type* type) {
 	EXIT_IF_NOT(POOL_TRAIT_IMPL_COUNT < MAX_TRAIT_IMPLS, "Cannot create TraitImpl \"%s\" for Type \"%s\"", trait->name.str, type->name.str);
 
 	TraitImpl* impl = malloc(sizeof(TraitImpl));
-	impl->type = type;
+	impl->type_id = type->id;
 	impl->trait = trait;
 	memset(impl->methods, 0, sizeof(impl->methods));
 	POOL_TRAIT_IMPL[POOL_TRAIT_IMPL_COUNT++] = impl;
@@ -220,18 +234,17 @@ void TraitImpl_addMethod(TraitImpl* trait_impl, const Method* method, const Meth
 	EXIT("Method \"%s\" not found in Trait \"%s\"", method->name.str, trait_impl->trait->name.str);
 }
 
-TraitImpl* TraitImpl_get(const Type* type, const Trait* trait) {
+TraitImpl* TraitImpl_get(const size_t type_id, const Trait* trait) {
 	EXIT_IF(trait == NULL, "param trait cannot be NULL");
-	EXIT_IF(type == NULL, "param type cannot be NULL");
 
 	for (size_t i = 0; i < POOL_TRAIT_IMPL_COUNT; ++i) {
 		TraitImpl* impl = POOL_TRAIT_IMPL[i];
-		if (Type_equal(impl->type, type) && Trait_equal(impl->trait, trait)) {
+		if (impl->type_id == type_id && Trait_equal(impl->trait, trait)) {
 			return impl;
 		}
 	}
 
-	EXIT("No implementation of Trait \"%s\" found for Type \"%s\"", trait->name.str, type->name.str);
+	EXIT("No implementation of Trait \"%s\" found for Type \"%s\"", trait->name.str, Type_getById(type_id)->name.str);
 	return NULL;
 }
 
@@ -246,7 +259,7 @@ MethodImpl TraitImpl_getMethodImpl(const TraitImpl* trait_impl, const HashStr me
 		}
 	}
 
-	EXIT("No implementation of Method \"%s\" of Trait \"%s\" found for Type \"%s\"", method_name.str, trait_impl->trait->name.str, trait_impl->type->name.str);
+	EXIT("No implementation of Method \"%s\" of Trait \"%s\" found for Type \"%s\"", method_name.str, trait_impl->trait->name.str, Type_getById(trait_impl->type_id)->name.str);
 	return NULL;
 }
 
@@ -254,23 +267,23 @@ MethodImpl TraitImpl_getMethodImpl(const TraitImpl* trait_impl, const HashStr me
 // OBJECT
 // =====================================
 
-Object* Object_newFrom(Type* type, void* data) {
+Object* Object_newFrom(const Type* type, void* data) {
 	EXIT_IF(type == NULL, "param type cannot be NULL");
 	Object* obj = malloc(sizeof(Object));
-	obj->type = type;
+	obj->type_id = type->id;
 	obj->data = data;
 	return obj;
 }
 
-Object* Object_new(Type* type) {
+Object* Object_new(const Type* type) {
 	EXIT_IF(type == NULL, "param type cannot be NULL");
-	return Object_newFrom(type, malloc(type->size));
+	return Object_newFrom(type, calloc(1, type->size));
 }
 
 MethodImpl Object_getMethod(const Object* obj, const HashStr trait_name, const HashStr method_name) {
 	EXIT_IF(obj == NULL, "param obj cannot be NULL");
 	const Trait* trait = Trait_get(trait_name);
-	const TraitImpl* impl = TraitImpl_get(obj->type, trait);
+	const TraitImpl* impl = TraitImpl_get(obj->type_id, trait);
 	return TraitImpl_getMethodImpl(impl, method_name);
 }
 
@@ -290,7 +303,7 @@ void* Object_callStr(const Object* obj, const HashStr trait_name, const HashStr 
 	EXIT_IF(obj == NULL, "param obj cannot be NULL");
 
 	const Trait* trait = Trait_get(trait_name);
-	const TraitImpl* trait_impl = TraitImpl_get(obj->type, trait);
+	const TraitImpl* trait_impl = TraitImpl_get(obj->type_id, trait);
 	const Method* trait_method = Trait_getMethod(trait, method_name);
 
 	va_list args;
@@ -306,7 +319,7 @@ void* Object_call(const Object* obj, const Method* method, ...) {
 	EXIT_IF(method == NULL, "param method cannot be NULL");
 
 	const Trait* trait = (Trait*)method->trait;
-	const TraitImpl* trait_impl = TraitImpl_get(obj->type, trait);
+	const TraitImpl* trait_impl = TraitImpl_get(obj->type_id, trait);
 
 	va_list args;
 	va_start(args, method->param_count);
@@ -316,20 +329,25 @@ void* Object_call(const Object* obj, const Method* method, ...) {
 	return result;
 }
 
+Type* Object_getType(const Object* obj) {
+	EXIT_IF(obj == NULL, "param obj cannot be NULL");
+	return Type_getById(obj->type_id);
+}
+
 bool Object_is(const Object* obj, const Type* type) {
 	if (obj == NULL || type == NULL) return false;
-	return Type_equal(obj->type, type);
+	return obj->type_id == type->id;
 }
 
 bool Object_implement(const Object* obj, const Trait* trait) {
 	if (obj == NULL || trait == NULL) return false;
-	return Type_implement(obj->type, trait);
+	return Type_implementById(obj->type_id, trait);
 }
 
 void Object_finalize(Object* obj) {
 	if (obj == NULL) return;
 
-	if (Type_implement(obj->type, BuiltIn.traits.Finalizable.trait)) {
+	if (Type_implementById(obj->type_id, BuiltIn.traits.Finalizable.trait)) {
 		Object_call(obj, BuiltIn.traits.Finalizable.methods.finalize);
 	}
 

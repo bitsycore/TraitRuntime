@@ -33,9 +33,9 @@ void Point_initType(void) {
 void* Point_MethodImpl_Format_toString(const MethodContext* CTX, va_list args) {
 	const DataPoint* this = METHOD_UNWRAP_START("Point", "Format", "toString");
 	METHOD_UNWRAP_END();
-	const int len = snprintf(NULL, 0, "%s(x=%d, y=%d)", CTX->object->type->name.str, this->x, this->y);
+	const int len = snprintf(NULL, 0, "%s(x=%d, y=%d)", Type_getById(CTX->object->type_id)->name.str, this->x, this->y);
 	char* buf = malloc(len + 1);
-	snprintf(buf, len + 1, "%s(x=%d, y=%d)", CTX->object->type->name.str, this->x, this->y);
+	snprintf(buf, len + 1, "%s(x=%d, y=%d)", Type_getById(CTX->object->type_id)->name.str, this->x, this->y);
 	return buf;
 }
 
@@ -44,9 +44,9 @@ void* Point_MethodImpl_Format_toString(const MethodContext* CTX, va_list args) {
 // ===========================================================
 
 void Point_MethodImpl_Finalizable_finalize(const MethodContext* CTX, va_list args) {
-	METHOD_UNWRAP_START("Point", "Finalizable", "finalize");
+	METHOD_UNWRAP_START_GENERIC("Finalizable", "finalize");
 	METHOD_UNWRAP_END();
-	printf("%s got freed", CTX->object->type->name.str);
+	printf("%s got freed", Type_getById(CTX->object->type_id)->name.str);
 }
 
 // ===========================================================

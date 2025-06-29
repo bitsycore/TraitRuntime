@@ -28,9 +28,10 @@ void* MethodImpl_Vector3f_Format_toString(const MethodContext* CTX, va_list args
 	const DataVector3f* this = METHOD_UNWRAP_START("Vector3f", "Format", "toString");
 	METHOD_UNWRAP_END();
 	const char* template = "%s(x=%f, y=%f, z=%f)";
-	const int len = snprintf(NULL, 0, template, CTX->object->type->name.str, this->x, this->y, this->z);
+	const Type* type = Object_getType(CTX->object);
+	const int len = snprintf(NULL, 0, template, type->name.str, this->x, this->y, this->z);
 	char* buf = malloc(len + 1);
-	snprintf(buf, len + 1, template, CTX->object->type->name.str, this->x, this->y, this->z);
+	snprintf(buf, len + 1, template, type->name.str, this->x, this->y, this->z);
 	return buf;
 }
 

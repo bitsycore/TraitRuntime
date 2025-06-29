@@ -22,10 +22,11 @@ struct Trait;
 typedef struct {
 	HashStr name;
 	size_t size;
+	size_t id;
 } Type;
 
 typedef struct {
-	Type* type;
+	size_t type_id;
 	void* data;
 } Object;
 
@@ -52,7 +53,7 @@ typedef struct {
 typedef void* (*MethodImpl)(MethodContext CTX, va_list argv);
 
 typedef struct {
-	Type* type;
+	size_t type_id;
 	Trait* trait;
 	MethodImpl methods[MAX_METHODS_PER_TRAITS];
 } TraitImpl;
@@ -66,7 +67,9 @@ void TraitRuntime_clean();
 // Type
 Type* Type_create(HashStr name, size_t size);
 Type* Type_get(HashStr name);
+Type* Type_getById(size_t id);
 bool Type_implement(const Type* type, const Trait* trait);
+bool Type_implementById(size_t id, const Trait* trait);
 bool Type_equal(const Type* this, const Type* other);
 
 // ===================================
@@ -81,19 +84,20 @@ bool Trait_equal(const Trait* this, const Trait* other);
 // TraitImpl
 TraitImpl* TraitImpl_create(Trait* trait, Type* type);
 void TraitImpl_addMethod(TraitImpl* trait_impl, const Method* method, MethodImpl method_impl);
-TraitImpl* TraitImpl_get(const Type* type, const Trait* trait);
+TraitImpl* TraitImpl_get(const size_t type_id, const Trait* trait);
 MethodImpl TraitImpl_getMethodImpl(const TraitImpl* trait_impl, HashStr method_name);
 
 // ===================================
 // Object
-Object* Object_new(Type* type);
-Object* Object_newFrom(Type* type, void* data);
+Object* Object_new(const Type* type);
+Object* Object_newFrom(const Type* type, void* data);
 MethodImpl Object_getMethod(const Object* obj, HashStr trait_name, HashStr method_name);
 bool Object_is(const Object* obj, const Type* type);
 bool Object_implement(const Object* obj, const Trait* trait);
 void Object_finalize(Object* obj);
 void* Object_call(const Object* obj, const Method* method, ...);
 void* Object_callStr(const Object* obj, HashStr trait_name, HashStr method_name, ... );
+Type* Object_getType(const Object* obj);
 
 // ======================================================================================
 // BUILT IN TYPE
@@ -195,7 +199,13 @@ extern BuiltInStore BuiltIn;
 
 #define METHOD_UNWRAP_START(objTypeName, traitTypeName, methodTypeName) \
 	CTX->object->data; \
-	assert(HashStr_equal(&CTX->object->type->name, &HASH_STR(objTypeName))); \
+	assert(HashStr_equal(&Type_getById(CTX->object->type_id)->name, &HASH_STR(objTypeName))); \
+	assert(HashStr_equal(&CTX->trait->name, &HASH_STR(traitTypeName))); \
+	assert(HashStr_equal(&CTX->method->name, &HASH_STR(methodTypeName))); \
+	unsigned int HIDDEN___count = 0\
+
+#define METHOD_UNWRAP_START_GENERIC(traitTypeName, methodTypeName) \
+	CTX->object->data; \
 	assert(HashStr_equal(&CTX->trait->name, &HASH_STR(traitTypeName))); \
 	assert(HashStr_equal(&CTX->method->name, &HASH_STR(methodTypeName))); \
 	unsigned int HIDDEN___count = 0\
@@ -212,5 +222,5 @@ extern BuiltInStore BuiltIn;
 // =========================================
 
 #define USE(T, traitName) for (T * it = traitName; it != NULL; it = NULL)
-
+#define REPEAT(count) for (unsigned int i = 0; i < count; i++)
 #endif
