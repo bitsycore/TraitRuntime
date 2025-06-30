@@ -123,7 +123,7 @@ int main() {
 	const clock_t start2 = clock();
 	// =====================================================================
 	// Create Object
-	REPEAT(1) {
+	TR_REPEAT(1) {
 		do_work();
 	}
 	const clock_t end2 = clock();

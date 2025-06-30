@@ -7,6 +7,7 @@
 #include <stdlib.h>
 
 #include "HashStr.h"
+#include "common/MacroUtils.h"
 #include "common/ErrorHandling.h"
 
 #define ENABLE_BUILTIN true
@@ -138,43 +139,6 @@ typedef struct {
 
 extern BuiltInStore BuiltIn;
 
-// ======================================================================================
-// MACRO PRIVATE UTILS
-// ======================================================================================
-
-#define TR___MAP0(m,x1)
-#define TR___MAP1(m,x1,...) m(x1), TR___MAP0(m,__VA_ARGS__)
-#define TR___MAP2(m,x1,...) m(x1), TR___MAP1(m,__VA_ARGS__)
-#define TR___MAP3(m,x1,...) m(x1), TR___MAP2(m,__VA_ARGS__)
-#define TR___MAP4(m,x1,...) m(x1), TR___MAP3(m,__VA_ARGS__)
-#define TR___MAP5(m,x1,...) m(x1), TR___MAP4(m,__VA_ARGS__)
-#define TR___MAP6(m,x1,...) m(x1), TR___MAP5(m,__VA_ARGS__)
-#define TR___MAP7(m,x1,...) m(x1), TR___MAP6(m,__VA_ARGS__)
-#define TR___MAP8(m,x1,...) m(x1), TR___MAP7(m,__VA_ARGS__)
-#define TR___MAP9(m,x1,...) m(x1), TR___MAP8(m,__VA_ARGS__)
-#define TR___MAP10(m,x1,...) m(x1), TR___MAP9(m,__VA_ARGS__)
-#define TR___MAP11(m,x1,...) m(x1), TR___MAP10(m,__VA_ARGS__)
-#define TR___MAP12(m,x1,...) m(x1), TR___MAP11(m,__VA_ARGS__)
-#define TR___MAP13(m,x1,...) m(x1), TR___MAP12(m,__VA_ARGS__)
-#define TR___MAP14(m,x1,...) m(x1), TR___MAP13(m,__VA_ARGS__)
-#define TR___MAP15(m,x1,...) m(x1), TR___MAP14(m,__VA_ARGS__)
-#define TR___MAP16(m,x1,...) m(x1), TR___MAP15(m,__VA_ARGS__)
-#define TR___MAP17(m,x1,...) m(x1), TR___MAP16(m,__VA_ARGS__)
-#define TR___MAP18(m,x1,...) m(x1), TR___MAP17(m,__VA_ARGS__)
-#define TR___MAP19(m,x1,...) m(x1), TR___MAP18(m,__VA_ARGS__)
-#define TR___MAP20(m,x1,...) m(x1), TR___MAP19(m,__VA_ARGS__)
-
-#define TR___GET_MACRO(_0,_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12,_13,_14,_15,_16, _17,_18,_19,_20,NAME,...) NAME
-
-#define TR___MAP(m, ...) TR___GET_MACRO(__VA_ARGS__, \
-	TR___MAP20, TR___MAP19, TR___MAP18, TR___MAP17, TR___MAP16, TR___MAP15, \
-	TR___MAP14, TR___MAP13, TR___MAP12, TR___MAP11, TR___MAP10, TR___MAP9, TR___MAP8, \
-	TR___MAP7, TR___MAP6, TR___MAP5, TR___MAP4, TR___MAP3, TR___MAP2, TR___MAP1, TR___MAP0 \
-)(m, __VA_ARGS__)
-
-#define TR_____COUNT_ARGS(...) TR_____COUNT_ARGS_(,##__VA_ARGS__,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0)
-#define TR_____COUNT_ARGS_(z,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,cnt,...) cnt
-
 // =========================================
 // SUGAR
 // =========================================
@@ -184,12 +148,13 @@ extern BuiltInStore BuiltIn;
 #define TYPE(name, data) \
 	Type_create(HASH_STR(name), sizeof(data))
 
-#define TR____GET_TRAIT_MACRO(_1, _2, NAME, ...) NAME
-#define TR____TRAIT1(name) Trait_create(HASH_STR(name), 0)
-#define TR____TRAIT2(name, type) Trait_create(HASH_STR(name), sizeof(type))
-#define TRAIT(...) TR____GET_TRAIT_MACRO(__VA_ARGS__, TR____TRAIT2, TR____TRAIT1)(__VA_ARGS__)
+#define _______TR_TRAIT_0() ((void)0, EXIT("Cannot create a trait without a name"))
+#define _______TR_TRAIT_1(name) Trait_create(HASH_STR(name), 0)
+#define _______TR_TRAIT_2(name, type) Trait_create(HASH_STR(name), sizeof(type))
+#define _______TR_TRAIT_N(...) MU_GET_MACRO_2(__VA_ARGS__, _______TR_TRAIT_2, _______TR_TRAIT_1, _______TR_TRAIT_0)
+#define TRAIT(...) _______TR_TRAIT_N(__VA_ARGS__)(__VA_ARGS__)
 
-#define DEF_PARAM(...) TR_____COUNT_ARGS(__VA_ARGS__) == 0 ? NULL : (HashStr[]){ TR___MAP(HASH_STR, __VA_ARGS__) }, TR_____COUNT_ARGS(__VA_ARGS__)
+#define DEF_PARAM(...) MU_COUNT_ARGS(__VA_ARGS__) == 0 ? NULL : (HashStr[]){ MU_MAP(HASH_STR, __VA_ARGS__) }, MU_COUNT_ARGS(__VA_ARGS__)
 #define PARAM_VA_MARK "__*_VAMARK_*__"
 #define TRAIT_ADD_METHOD(trait, method_name, ...) Trait_addMethod(trait, HASH_STR(method_name), DEF_PARAM(__VA_ARGS__))
 #define TRAIT_GET(trait_name) Trait_get(HASH_STR(trait_name))
@@ -243,6 +208,7 @@ extern BuiltInStore BuiltIn;
 // MACRO UTILITIES
 // =========================================
 
-#define USE(T, traitName) for (T * it = traitName; it != NULL; it = NULL)
-#define REPEAT(count) for (unsigned int i = 0; i < count; i++)
+#define TR_USE(T, traitName) for (T * it = traitName; it != NULL; it = NULL)
+#define TR_REPEAT(count) for (unsigned int i = 0; i < count; i++)
+
 #endif

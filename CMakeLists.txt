@@ -24,6 +24,7 @@ add_executable(TraitRuntime
         common/Debug.h
         Log.h
         Log.c
+        common/MacroUtils.h
 )
 
 if (MSVC AND CMAKE_BUILD_TYPE STREQUAL "Debug")
