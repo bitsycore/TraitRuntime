@@ -148,11 +148,9 @@ extern BuiltInStore BuiltIn;
 #define TYPE(name, data) \
 	Type_create(HASH_STR(name), sizeof(data))
 
-#define _______TR_TRAIT_0() ((void)0, EXIT("Cannot create a trait without a name"))
-#define _______TR_TRAIT_1(name) Trait_create(HASH_STR(name), 0)
+#define _______TR_TRAIT_1(name, ...) Trait_create(HASH_STR(name), 0)
 #define _______TR_TRAIT_2(name, type) Trait_create(HASH_STR(name), sizeof(type))
-#define _______TR_TRAIT_N(...) MU_GET_MACRO_2(__VA_ARGS__, _______TR_TRAIT_2, _______TR_TRAIT_1, _______TR_TRAIT_0)
-#define TRAIT(...) _______TR_TRAIT_N(__VA_ARGS__)(__VA_ARGS__)
+#define TRAIT(name, ...) MU_GET_MACRO_2(_, ##__VA_ARGS__, _______TR_TRAIT_2, _______TR_TRAIT_1)(name, __VA_ARGS__)
 
 #define DEF_PARAM(...) MU_COUNT_ARGS(__VA_ARGS__) == 0 ? NULL : (HashStr[]){ MU_MAP(HASH_STR, __VA_ARGS__) }, MU_COUNT_ARGS(__VA_ARGS__)
 #define PARAM_VA_MARK "__*_VAMARK_*__"
@@ -166,10 +164,10 @@ extern BuiltInStore BuiltIn;
     TraitImpl_addMethod(traitImpl, Trait_getMethod(traitImpl->trait, HASH_STR(methodName)), fn)
 
 #define CALL(obj, methodName, ...) \
-	Object_callStr(obj, HASH_STR(methodName) __VA_OPT__(,) __VA_ARGS__) \
+	Object_callStr(obj, HASH_STR(methodName) __VA_OPT__(,) __VA_ARGS__)
 
 #define CALL_EX(obj, traitName, methodName, ...) \
-	Object_callStrEx(obj, HASH_STR(traitName), HASH_STR(methodName) __VA_OPT__(,) __VA_ARGS__) \
+	Object_callStrEx(obj, HASH_STR(traitName), HASH_STR(methodName) __VA_OPT__(,) __VA_ARGS__)
 
 // =========================================
 // METHOD DEFINITION

@@ -17,6 +17,31 @@ _31,_32,_33,_34,_35,_36,_37,_38,_39,_40,N,\
     9,  8,  7,  6,  5,  4,  3,  2,  1,  0	\
 )
 
+// ----------------------------------------------------
+// Optional param with at least ONE argument
+// ----------------------------------------------------
+// #define FUN_1(x,...) "fun_1"
+// #define FUN_2(x, y, ...) "fun_2"
+// #define FUN(...) MU_GET_MACRO_2(__VA_ARGS__, FUN_2, FUN_1)(__VA_ARGS__)
+
+// ----------------------------------------------------
+// Optional param with ZERO or more arguments
+// ----------------------------------------------------
+// #define FUN_0(...) "fun_0"
+// #define FUN_1(x,...) "fun_1"
+// #define FUN_2(x, y, ...) "fun_2"
+// #define FUN(...) MU_GET_MACRO_3(_, ##__VA_ARGS__, FUN_2, FUN_1, FUN_0)(__VA_ARGS__)
+//                                  ^-- Leading placeholder allows correct dispatch when __VA_ARGS__ is empty
+
+// ----------------------------------------------------
+// First param required, rest optional.
+// ----------------------------------------------------
+// Can be repeated for more required params.
+// variadic (...) required for fun before the last one (one more for each time repeated).
+// #define FUN_1(x, ...) fun(x, 0)
+// #define FUN_2(x, y)   fun(x, y)
+// #define TRAIT(x, ...) MU_GET_MACRO_2(_, ##__VA_ARGS__, FUN_1, FUN_2)(x, __VA_ARGS__)
+
 #define MU_GET_MACRO_1(_1, NAME, ...) NAME
 #define MU_GET_MACRO_2(_1, _2, NAME, ...) NAME
 #define MU_GET_MACRO_3(_1, _2, _3, NAME, ...) NAME
