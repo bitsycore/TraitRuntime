@@ -23,7 +23,7 @@ void* Point_MethodImpl_Finalizable_finalize(MethodContext* CTX) {
 	TR_CHECK_TRAIT_STR("Finalizable");
 	TR_CHECK_METHOD_STR("finalize");
 	TR_METHOD_UNWRAP_END();
-	LOG("%s got finalized\n", Class_getById(CTX->object->type_id)->name.str);
+	LOG("%s got finalized\n", Class_getById(CTX->object->class_id)->name.str);
 	return NULL;
 }
 
@@ -32,7 +32,7 @@ void* Point_MethodImpl_Constructable_construct(MethodContext* CTX) {
 	TR_CHECK_TRAIT_STR("Constructable");
 	TR_CHECK_METHOD_STR("construct");
 	TR_METHOD_UNWRAP_END();
-	LOG("%s got constructed\n", Class_getById(CTX->object->type_id)->name.str);
+	LOG("%s got constructed\n", Class_getById(CTX->object->class_id)->name.str);
 	return NULL;
 }
 
@@ -67,9 +67,9 @@ void* Point_MethodImpl_Describe_toString(MethodContext* CTX) {
 	TR_CHECK_ALL(clsPoint, trDescribe.trait, trDescribe.methods.toString);
 	TR_METHOD_UNWRAP_END();
 
-	const int len = snprintf(NULL, 0, "%s(x=%d, y=%d)", Class_getById(CTX->object->type_id)->name.str, this->x, this->y);
+	const int len = snprintf(NULL, 0, "%s(x=%d, y=%d)", Class_getById(CTX->object->class_id)->name.str, this->x, this->y);
 	char* buf = malloc(len + 1);
-	snprintf(buf, len + 1, "%s(x=%d, y=%d)", Class_getById(CTX->object->type_id)->name.str, this->x, this->y);
+	snprintf(buf, len + 1, "%s(x=%d, y=%d)", Class_getById(CTX->object->class_id)->name.str, this->x, this->y);
 	return buf;
 }
 

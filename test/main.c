@@ -34,9 +34,9 @@ void* MethodImpl_Describe_UInt64_toString(MethodContext* CTX) {
 	TR_CHECK_ALL_STR("UInt64", "Describe", "toString");
 	TR_METHOD_UNWRAP_END();
 	const char* template = "%s(%llu)";
-	const int len = snprintf(NULL, 0, template, Class_getById(CTX->object->type_id)->name.str, this);
+	const int len = snprintf(NULL, 0, template, Class_getById(CTX->object->class_id)->name.str, this);
 	char* buf = malloc(len + 1);
-	snprintf(buf, len + 1, template, Class_getById(CTX->object->type_id)->name.str, this);
+	snprintf(buf, len + 1, template, Class_getById(CTX->object->class_id)->name.str, this);
 	return buf;
 }
 

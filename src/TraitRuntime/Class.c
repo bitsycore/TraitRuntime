@@ -52,8 +52,7 @@ bool Class_implement(const Class* clazz, const Trait* trait) {
 	for (size_t i = 0; i < clazz->trait_impl_count; ++i) {
 		const TraitImpl* impl = &clazz->traits_impl[i];
 		if (
-			Trait_equal(impl->trait, trait) &&
-			impl->class_id == clazz->id
+			Trait_equal(impl->trait, trait)
 		) {
 			return true;
 		}

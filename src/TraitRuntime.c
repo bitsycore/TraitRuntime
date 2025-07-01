@@ -9,17 +9,11 @@
 #include "TraitRuntime/Commons/ErrorHandling.h"
 #include "TraitRuntime/Memory/Arena.h"
 
-
-// =====================================
-// MARK: BUILT IN TYPE
-// =====================================
-
-Container_BuiltIn BuiltIn;
-
 // =====================================
 // MARK: GENERAL
 // =====================================
 
+Container_BuiltIn BuiltIn;
 static bool IS_INIT = false;
 Arena* ARENA_GLOBAL;
 
@@ -50,6 +44,7 @@ void TraitRuntime_init(const bool enable_builtin) {
 	IS_INIT = true;
 
 	if (enable_builtin == false) return;
+
 	// ==============================================
 	// LOAD ALL BUILT IN TYPES AND TRAIT
 	INTERNAL_initialize_built_in_traits_and_types();

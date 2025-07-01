@@ -14,14 +14,12 @@ size_t POOL_TRAITS_COUNT = 0;
 
 Trait* Trait_create(const HashStr name, const size_t data_size) {
 	EXIT_IF_NOT(POOL_TRAITS_COUNT < MAX_TRAITS, "Can't add Trait \"%s\", Max number of Trait created in TraitRuntime", name.str);
-	POOL_TRAITS[POOL_TRAITS_COUNT] = (Trait){
-		.name = name,
-		.method_count = 0,
-		.data_size = data_size
-	};
-	Trait* t = &POOL_TRAITS[POOL_TRAITS_COUNT];
+	Trait* trait = &POOL_TRAITS[POOL_TRAITS_COUNT];
+	trait->name = name;
+	trait->data_size = data_size;
+	trait->id = POOL_TRAITS_COUNT;
 	POOL_TRAITS_COUNT++;
-	return t;
+	return trait;
 }
 
 Trait* Trait_get(const HashStr name) {
@@ -86,7 +84,6 @@ TraitImpl* TraitImpl_create(Trait* trait, Class* clazz) {
 
 	TraitImpl* trait_impl = &clazz->traits_impl[clazz->trait_impl_count];
 
-	trait_impl->class_id = clazz->id;
 	trait_impl->trait = trait;
 
 	clazz->trait_impl_count++;
@@ -118,7 +115,7 @@ TraitImpl* TraitImpl_get(const size_t type_id, const Trait* trait) {
 
 	for (size_t i = 0; i < clazz->trait_impl_count; ++i) {
 		TraitImpl* impl = &clazz->traits_impl[i];
-		if (impl->class_id == type_id && Trait_equal(impl->trait, trait)) {
+		if (Trait_equal(impl->trait, trait)) {
 			return impl;
 		}
 	}
@@ -127,7 +124,7 @@ TraitImpl* TraitImpl_get(const size_t type_id, const Trait* trait) {
 	return NULL;
 }
 
-MethodImpl TraitImpl_getMethodImpl(const TraitImpl* trait_impl, const HashStr method_name) {
+MethodImpl TraitImpl_getMethodImplStr(const TraitImpl* trait_impl, const HashStr method_name) {
 	EXIT_IF(trait_impl == NULL, "param trait_impl cannot be NULL");
 
 	for (size_t j = 0; j < trait_impl->trait->method_count; ++j) {
@@ -138,24 +135,36 @@ MethodImpl TraitImpl_getMethodImpl(const TraitImpl* trait_impl, const HashStr me
 		}
 	}
 
-	EXIT("No implementation of Method \"%s\" of Trait \"%s\" found for Class \"%s\"", method_name.str, trait_impl->trait->name.str, Class_getById(trait_impl->class_id)->name.str);
+	EXIT("No implementation of Method \"%s\" of Trait \"%s\" found for Class \"%s\"", method_name.str, trait_impl->trait->name.str);
 	return NULL;
 }
 
-TraitImpl* TraitImpl_getForMethod(const size_t type_id, const HashStr methodName) {
-	Class* clazz = Class_getById(type_id);
+MethodImpl TraitImpl_getMethodImpl(const TraitImpl* trait_impl, const Method* method) {
+	EXIT_IF(trait_impl == NULL, "param trait_impl cannot be NULL");
+
+	for (size_t j = 0; j < trait_impl->trait->method_count; ++j) {
+		if (HashStr_equal(&trait_impl->trait->methods[j].name, &method->name) == true) {
+			const MethodImpl method_impl = trait_impl->methods[j];
+			if (method_impl == NULL) break;
+			return method_impl;
+		}
+	}
+
+	EXIT("No implementation of Method \"%s\" of Trait \"%s\" found for Class \"%s\"", method->name.str, trait_impl->trait->name.str);
+	return NULL;
+}
+
+TraitImpl* TraitImpl_getForMethodStr(Class* clazz, const HashStr methodName) {
 	for (size_t i = 0; i < clazz->trait_impl_count; ++i) {
 		TraitImpl* impl = &clazz->traits_impl[i];
-		if (impl->class_id == type_id) {
-			for (size_t j = 0; j < impl->trait->method_count; ++j) {
-				const Method method = impl->trait->methods[j];
-				if (HashStr_equal(&method.name, &methodName)) {
-					return impl;
-				}
+		for (size_t j = 0; j < impl->trait->method_count; ++j) {
+			const Method method = impl->trait->methods[j];
+			if (HashStr_equal(&method.name, &methodName)) {
+				return impl;
 			}
 		}
 	}
 
-	EXIT("No Implementation of Method \"%s\" found for Class \"%s\"", methodName.str, Class_getById(type_id)->name.str);
+	EXIT("No Implementation of Method \"%s\" found for Class \"%s\"", methodName.str, clazz->name.str);
 	return NULL;
 }

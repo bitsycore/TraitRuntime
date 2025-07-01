@@ -26,8 +26,11 @@ struct TraitImpl;
 struct Method;
 struct MethodContext;
 
+typedef size_t TraitId;
+typedef size_t ClassId;
+
 typedef struct Object {
-	size_t type_id;
+	ClassId class_id;
 	void* data;
 } Object;
 
@@ -40,6 +43,7 @@ typedef struct Method {
 } Method;
 
 typedef struct Trait {
+	TraitId id;
 	HashStr name;
 	Method methods[MAX_METHODS_PER_TRAITS];
 	size_t method_count;
@@ -56,7 +60,6 @@ typedef struct MethodContext {
 typedef void* (*MethodImpl)(MethodContext* CTX);
 
 typedef struct TraitImpl {
-	size_t class_id;
 	Trait* trait;
 	MethodImpl methods[MAX_METHODS_PER_TRAITS];
 } TraitImpl;
