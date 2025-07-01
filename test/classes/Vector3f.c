@@ -13,8 +13,8 @@ Class* clsVector3f;
 // METHODS
 // ===========================================================
 
-void Vector3f_initType() {
-	clsVector3f = TR_TYPE("Vector3f", Data_Vector3f);
+void Vector3f_initClass() {
+	clsVector3f = TR_CLASS("Vector3f", Data_Vector3f);
 	TraitImpl* traitImpl_Describe_Vector3f = TraitImpl_create(trDescribe.trait, clsVector3f);
 	TraitImpl_addMethod(traitImpl_Describe_Vector3f, trDescribe.methods.toString, MethodImpl_Vector3f_Describe_toString);
 
@@ -32,7 +32,7 @@ void* MethodImpl_Vector3f_Describe_toString(MethodContext* CTX) {
 	TR_CHECK_ALL_STR("Vector3f", "Describe", "toString");
 	TR_METHOD_UNWRAP_END();
 	const char* template = "%s(x=%f, y=%f, z=%f)";
-	const Class* type = Object_getType(CTX->object);
+	const Class* type = Object_getClass(CTX->object);
 	const int len = snprintf(NULL, 0, template, type->name.str, this->x, this->y, this->z);
 	char* buf = malloc(len + 1);
 	snprintf(buf, len + 1, template, type->name.str, this->x, this->y, this->z);

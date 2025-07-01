@@ -14,6 +14,9 @@ add_library(TraitRuntime
         src/TraitRuntime/Commons/Log.h
         src/TraitRuntime/Commons/Log.c
         src/TraitRuntime/Commons/MacroUtils.h
+        src/TraitRuntime/Memory/Arena.h
+        src/TraitRuntime/Memory/MemPool.c
+        src/TraitRuntime/Memory/MemPool.h
 )
 
 add_executable(AppTest

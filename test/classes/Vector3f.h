@@ -13,7 +13,7 @@ typedef struct {
     float x, y, z;
 } Data_Vector3f;
 
-void Vector3f_initType();
+void Vector3f_initClass();
 void* MethodImpl_Vector3f_Describe_toString(MethodContext* CTX);
 void* MethodImpl_Move3f_Vector3f_move(MethodContext* CTX);
 void* MethodImpl_Move3f_Vector3f_moveX(MethodContext* CTX);

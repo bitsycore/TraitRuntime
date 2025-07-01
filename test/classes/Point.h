@@ -9,7 +9,7 @@ typedef struct {
 	int x, y;
 } DataPoint;
 
-void Point_initType(void);
+void Point_initClass(void);
 
 void* Point_MethodImpl_Describe_toString(MethodContext* CTX);
 

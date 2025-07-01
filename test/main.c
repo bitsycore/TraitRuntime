@@ -31,19 +31,19 @@ void* MethodImpl_Describe_UInt64_toString(MethodContext* CTX) {
 	TR_CHECK_ALL_STR("UInt64", "Describe", "toString");
 	TR_METHOD_UNWRAP_END();
 	const char* template = "%s(%llu)";
-	const int len = snprintf(NULL, 0, template, Type_getById(CTX->object->type_id)->name.str, this);
+	const int len = snprintf(NULL, 0, template, Class_getById(CTX->object->type_id)->name.str, this);
 	char* buf = malloc(len + 1);
-	snprintf(buf, len + 1, template, Type_getById(CTX->object->type_id)->name.str, this);
+	snprintf(buf, len + 1, template, Class_getById(CTX->object->type_id)->name.str, this);
 	return buf;
 }
 
 void printObjInfo(const Object* instance_point) {
-	const Class* type = Object_getType(instance_point);
+	const Class* type = Object_getClass(instance_point);
 	LOG("Object is of type: %s\n", type->name.str);
 	LOG("Object data size: %zu\n", type->size);
-	LOG("Point implement Describe = %d\n", Type_implement(type, trDescribe.trait));
-	LOG("Point implement Move2i = %d\n", Type_implement(type, trMove2i.trait));
-	LOG("Point implement Move3f = %d\n", Type_implement(type, trMove3f.trait));
+	LOG("Point implement Describe = %d\n", Class_implement(type, trDescribe.trait));
+	LOG("Point implement Move2i = %d\n", Class_implement(type, trMove2i.trait));
+	LOG("Point implement Move3f = %d\n", Class_implement(type, trMove3f.trait));
 }
 
 void do_work(void) {
@@ -108,9 +108,9 @@ int main() {
 	Move3f_loadTrait();
 
 	// =====================================================================
-	// Load Type & Impl Trait
-	Point_initType();
-	Vector3f_initType();
+	// Load Class & Impl Trait
+	Point_initClass();
+	Vector3f_initClass();
 
 	// =====================================================================
 	// Impl Traits for Uint64

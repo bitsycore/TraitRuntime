@@ -4,6 +4,21 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
+void debug_alert(const char *message) {
+	#if defined(_WIN32)
+		MessageBoxA(NULL, message, "Error", MB_OK | MB_ICONERROR);
+	#elif defined(__APPLE__)
+		// TODO obj-c
+	#elif defined(__linux__)
+		//
+	#endif
+}
+
+
 // =====================================================================================================================
 #ifdef _WIN32 // MARK: WINDOWS
 // =====================================================================================================================
@@ -12,10 +27,9 @@
 #if defined(_MSC_VER) && !defined(NDEBUG)// MARK: Visual Studio DEBUG
 // =====================================================================================================================
 
-#include <windows.h>
 #include <dbghelp.h>
 
-char* get_callstack(const int skip_frames) {
+char* debug_callstack(const int skip_frames) {
 	void* stack[100];
 	void* process = GetCurrentProcess();
 	SymInitialize(process, NULL, TRUE);
@@ -60,7 +74,7 @@ char* get_callstack(const int skip_frames) {
 #else // MARK: MinGW && RELEASE
 // =====================================================================================================================
 
-char* get_callstack(int skip_frames) {
+char* debug_callstack(int skip_frames) {
 	const char msg[] = "\n";
 	char* heap_msg = malloc(strlen(msg) + 1);
 	strcpy(heap_msg, msg);
@@ -78,7 +92,7 @@ char* get_callstack(int skip_frames) {
 #include <execinfo.h>
 #include <unistd.h>
 
-char* get_callstack() {
+char* debug_callstack() {
 	void* stack[100];
 	int frames = backtrace(stack, 100);
 	char** symbols = backtrace_symbols(stack, frames);

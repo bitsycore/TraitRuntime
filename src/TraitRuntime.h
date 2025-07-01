@@ -13,8 +13,8 @@
 #define ENABLE_BUILTIN true
 
 #define MAX_TRAITS 32
-#define MAX_TYPE 32
-#define MAX_TRAIT_IMPLS ((MAX_TYPE * MAX_TRAITS) / 2)
+#define MAX_CLASSES 32
+#define MAX_TRAIT_IMPLS ((MAX_CLASSES * MAX_TRAITS / 2))
 
 #define MAX_METHODS_PER_TRAITS 8
 #define MAX_PARAMS_PER_METHODS 8
@@ -73,13 +73,13 @@ void TraitRuntime_init(bool enable_builtin);
 void TraitRuntime_clean();
 
 // ===================================
-// Type
-Class* Type_create(HashStr name, size_t size);
-Class* Type_get(HashStr name);
-Class* Type_getById(size_t id);
-bool Type_implement(const Class* type, const Trait* trait);
-bool Type_implementById(size_t id, const Trait* trait);
-bool Type_equal(const Class* this, const Class* other);
+// Class
+Class* Class_create(HashStr name, size_t size);
+Class* Class_get(HashStr name);
+Class* Class_getById(size_t id);
+bool Class_implement(const Class* type, const Trait* trait);
+bool Class_implementById(size_t id, const Trait* trait);
+bool Class_equal(const Class* this, const Class* other);
 
 // ===================================
 // Trait
@@ -107,7 +107,7 @@ void Object_destroy(Object* obj);
 void* Object_call(const Object* obj, const Method* method, ...);
 void* Object_callStrEx(const Object* obj, HashStr trait_name, HashStr method_name, ... );
 void* Object_callStr(const Object* obj, HashStr method_name, ... );
-Class* Object_getType(const Object* obj);
+Class* Object_getClass(const Object* obj);
 
 // ======================================================================================
 // BUILT IN TYPE
@@ -149,7 +149,7 @@ extern Container_BuiltIn BuiltIn;
 // =========================================
 
 #define TR_INIT() TraitRuntime_init(ENABLE_BUILTIN)
-#define TR_TYPE(name, data) Type_create(HASH_STR(name), sizeof(data))
+#define TR_CLASS(name, data) Class_create(HASH_STR(name), sizeof(data))
 
 #define _______TR_TRAIT_1(name, ...) Trait_create(HASH_STR(name), 0)
 #define _______TR_TRAIT_2(name, type) Trait_create(HASH_STR(name), sizeof(type))
@@ -160,7 +160,7 @@ extern Container_BuiltIn BuiltIn;
 #define TR_PARAM_VA "__*_VAMARK_*__"
 
 
-#define TR_TRAIT_IMPL(traitName, typeName) TraitImpl_create(Trait_get(HASH_STR(traitName)), Type_get(HASH_STR(typeName)))
+#define TR_TRAIT_IMPL(traitName, typeName) TraitImpl_create(Trait_get(HASH_STR(traitName)), Class_get(HASH_STR(typeName)))
 #define TR_TRAIT_IMPL_METHOD(traitImpl, methodName, fn) TraitImpl_addMethod(traitImpl, Trait_getMethod(traitImpl->trait, HASH_STR(methodName)), fn)
 
 #define TR_OBJ_CALL(obj, methodName, ...) Object_callStr(obj, HASH_STR(methodName) __VA_OPT__(,) __VA_ARGS__)
@@ -175,9 +175,9 @@ extern Container_BuiltIn BuiltIn;
 	unsigned int HIDDEN___count = 0\
 
 #define TR_CHECK_TYPE(_type) \
-	EXIT_IF_NOT(Type_equal(Object_getType(CTX->object), _type), "Type \"%s\" called this method expecting type \"%s\"", Object_getType(CTX->object)->name.str, _type->name.str)
+	EXIT_IF_NOT(Class_equal(Object_getClass(CTX->object), _type), "Class \"%s\" called this method expecting type \"%s\"", Object_getClass(CTX->object)->name.str, _type->name.str)
 #define TR_CHECK_TRAIT(_trait) \
-	EXIT_IF_NOT(Trait_equal(CTX->trait, _trait), "Type \"%s\" called this method expecting type \"%s\"", CTX->trait->name.str, _trait->name.str)
+	EXIT_IF_NOT(Trait_equal(CTX->trait, _trait), "Class \"%s\" called this method expecting type \"%s\"", CTX->trait->name.str, _trait->name.str)
 #define TR_CHECK_METHOD(_method) \
 	EXIT_IF_NOT(HashStr_equal(&CTX->method->name, &_method->name), "Method \"%s\" called but this method expect \"%s\"", CTX->method->name.str, _method->name.str)
 #define TR_CHECK_METHOD_STR(_methodName) \
@@ -186,7 +186,7 @@ extern Container_BuiltIn BuiltIn;
 #define TR_CHECK_ALL(_type, _trait, _method) \
 	TR_CHECK_TYPE(_type); TR_CHECK_TRAIT(_trait); TR_CHECK_METHOD(_method)
 
-#define TR_CHECK_TYPE_STR(_typeName) TR_CHECK_TYPE(Type_get(HASH_STR(_typeName)))
+#define TR_CHECK_TYPE_STR(_typeName) TR_CHECK_TYPE(Class_get(HASH_STR(_typeName)))
 #define TR_CHECK_TRAIT_STR(_traitName) TR_CHECK_TRAIT(Trait_get(HASH_STR(_traitName)))
 #define TR_CHECK_ALL_STR(_typeName, _traitName, _methodName) TR_CHECK_TYPE_STR(_typeName); TR_CHECK_TRAIT_STR(_traitName); TR_CHECK_METHOD_STR(_methodName)
 
@@ -196,8 +196,8 @@ extern Container_BuiltIn BuiltIn;
 
 #define TR_METHOD_UNWRAP_END() \
 	EXIT_IF(HIDDEN___count != CTX->method->params_count, \
-		"Arg count declarated for Method \"%s\" differt from param unwrapping count for impl of Type \"%s\"", \
-		CTX->method->name.str, Object_getType(CTX->object)->name.str)
+		"Arg count declarated for Method \"%s\" differt from param unwrapping count for impl of Class \"%s\"", \
+		CTX->method->name.str, Object_getClass(CTX->object)->name.str)
 
 // =========================================
 // MACRO UTILITIES
