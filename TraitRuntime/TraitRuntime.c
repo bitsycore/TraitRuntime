@@ -5,6 +5,8 @@
 #include <string.h>
 #include "common/ErrorHandling.h"
 
+#define private static
+
 // =====================================
 // BUILT IN TYPE
 // =====================================
@@ -27,8 +29,27 @@ static TraitImpl* POOL_TRAIT_IMPL[MAX_TRAIT_IMPLS];
 static size_t POOL_TRAIT_IMPL_COUNT = 0;
 
 // =====================================
-// GENERAL
+// MARK: GENERAL
 // =====================================
+
+private void initialize_built_in_traits_and_types(void) {
+	BuiltIn.traits.Finalizable.trait = TR_TRAIT("Finalizable");
+	BuiltIn.traits.Finalizable.methods.finalize = Trait_addMethod(BuiltIn.traits.Finalizable.trait, HASH_STR("finalize"), TR_PARAMS());
+
+	BuiltIn.traits.Constructable.trait = TR_TRAIT("Constructable");
+	BuiltIn.traits.Constructable.methods.construct = Trait_addMethod(BuiltIn.traits.Constructable.trait, HASH_STR("construct"), TR_PARAMS());
+
+	BuiltIn.types.UInt8		= TR_TYPE("UInt8", uint8_t);
+	BuiltIn.types.UInt16	= TR_TYPE("UInt16", uint16_t);
+	BuiltIn.types.UInt32	= TR_TYPE("UInt32", uint32_t);
+	BuiltIn.types.UInt64	= TR_TYPE("UInt64", uint64_t);
+	BuiltIn.types.Int8		= TR_TYPE("Int8", int8_t);
+	BuiltIn.types.Int16		= TR_TYPE("Int16", int16_t);
+	BuiltIn.types.Int32		= TR_TYPE("Int32", int32_t);
+	BuiltIn.types.Int64		= TR_TYPE("Int64", int64_t);
+	BuiltIn.types.Float32	= TR_TYPE("Float32", float);
+	BuiltIn.types.Float64	= TR_TYPE("Float64", double);
+}
 
 void TraitRuntime_init(const bool enable_builtin) {
 	memset(POOL_TYPE, 0, sizeof(POOL_TRAIT_IMPL));
@@ -42,22 +63,7 @@ void TraitRuntime_init(const bool enable_builtin) {
 	// ==============================================
 	// LOAD ALL BUILT IN TYPES AND TRAIT
 
-	BuiltIn.traits.Finalizable.trait = TR_TRAIT("Finalizable");
-	BuiltIn.traits.Finalizable.methods.finalize = Trait_addMethod(BuiltIn.traits.Finalizable.trait, HASH_STR("finalize"), TR_PARAMS());
-
-	BuiltIn.traits.Constructable.trait = TR_TRAIT("Constructable");
-	BuiltIn.traits.Constructable.methods.construct = Trait_addMethod(BuiltIn.traits.Constructable.trait, HASH_STR("construct"), TR_PARAMS());
-
-	BuiltIn.types.UInt8 = TR_TYPE("UInt8", uint8_t);
-	BuiltIn.types.UInt16 = TR_TYPE("UInt16", uint16_t);
-	BuiltIn.types.UInt32 = TR_TYPE("UInt32", uint32_t);
-	BuiltIn.types.UInt64 = TR_TYPE("UInt64", uint64_t);
-	BuiltIn.types.Int8 = TR_TYPE("Int8", int8_t);
-	BuiltIn.types.Int16 = TR_TYPE("Int16", int16_t);
-	BuiltIn.types.Int32 = TR_TYPE("Int32", int32_t);
-	BuiltIn.types.Int64 = TR_TYPE("Int64", int64_t);
-	BuiltIn.types.Float32 = TR_TYPE("Float32", float);
-	BuiltIn.types.Float64 = TR_TYPE("Float64", double);
+	initialize_built_in_traits_and_types();
 }
 
 void TraitRuntime_clean() {
@@ -78,7 +84,7 @@ void TraitRuntime_clean() {
 }
 
 // =====================================
-// TYPE
+// MARK: TYPE
 // =====================================
 
 Type* Type_create(const HashStr name, const size_t size) {
@@ -153,7 +159,7 @@ TraitImpl* Type_getTraitImplMethod(const size_t type_id, const HashStr methodNam
 }
 
 // =====================================
-// TRAIT
+// MARK: TRAIT
 // =====================================
 
 Trait* Trait_create(const HashStr name, const size_t data_size) {
@@ -205,7 +211,7 @@ Method* Trait_addMethod(Trait* trait, const HashStr method_name, const HashStr* 
 }
 
 // =====================================
-// TRAIT METHOD
+// MARK: TRAIT
 // =====================================
 
 Method* Trait_getMethod(const Trait* trait, const HashStr method_name) {
@@ -223,7 +229,7 @@ Method* Trait_getMethod(const Trait* trait, const HashStr method_name) {
 }
 
 // =====================================
-// TRAIT IMPL
+// MARK: TRAIT IMPL
 // =====================================
 
 TraitImpl* TraitImpl_create(Trait* trait, Type* type) {
@@ -287,7 +293,7 @@ MethodImpl TraitImpl_getMethodImpl(const TraitImpl* trait_impl, const HashStr me
 }
 
 // =====================================
-// OBJECT
+// MARK: OBJECT
 // =====================================
 
 Object* Object_newFrom(const Type* type, void* data) {

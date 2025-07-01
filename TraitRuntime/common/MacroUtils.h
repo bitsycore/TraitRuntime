@@ -126,6 +126,25 @@ _31,_32,_33,_34,_35,_36,_37,_38,_39,_40,N,\
 #define _______MU_MAP39(m,x1,...) m(x1), _______MU_MAP38(m,__VA_ARGS__)
 #define _______MU_MAP40(m,x1,...) m(x1), _______MU_MAP39(m,__VA_ARGS__)
 
+/**
+ * @brief Maps a function-like macro across all variadic arguments
+ *
+ * - Supports 1 to 40 arguments
+ * - The macro `m` must accept exactly one parameter
+ * - Results are comma-separated for use in function calls, initializer lists, etc.
+ *
+ * @code{.h}
+ * #define HASH(x) hash_##x
+ * #define HASH_PARAMS(...) MU_MAP(HASH, __VA_ARGS__)
+ *
+ * HASH_PARAMS("Hello", "World", "Test")
+ * // Expands to: HASH("Hello"), HASH("World"), HASH("Test")
+ * @endcode
+ *
+ * @param m The function-like macro to apply to each argument
+ * @param ... Variadic arguments (up to 40 arguments supported)
+ */
+
 #define MU_MAP(m, ...) MU_GET_MACRO_40(__VA_ARGS__, \
 _______MU_MAP40, _______MU_MAP39, _______MU_MAP38, _______MU_MAP37, _______MU_MAP36, \
 _______MU_MAP35, _______MU_MAP34, _______MU_MAP33, _______MU_MAP32, _______MU_MAP31, \

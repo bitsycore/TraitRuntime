@@ -13,11 +13,11 @@
 #define ENABLE_BUILTIN true
 
 #define MAX_TRAITS 32
-#define MAX_TRAIT_IMPLS 32
 #define MAX_TYPE 32
+#define MAX_TRAIT_IMPLS ((MAX_TYPE * MAX_TRAITS) / 2)
 
 #define MAX_METHODS_PER_TRAITS 8
-#define MAX_PARAMS_PER_METHODS 8
+#define MAX_PARAMS_PER_METHODS 5
 
 struct Object;
 struct Type;
@@ -149,9 +149,7 @@ extern Container_BuiltIn BuiltIn;
 // =========================================
 
 #define TR_INIT() TraitRuntime_init(ENABLE_BUILTIN)
-
-#define TR_TYPE(name, data) \
-	Type_create(HASH_STR(name), sizeof(data))
+#define TR_TYPE(name, data) Type_create(HASH_STR(name), sizeof(data))
 
 #define _______TR_TRAIT_1(name, ...) Trait_create(HASH_STR(name), 0)
 #define _______TR_TRAIT_2(name, type) Trait_create(HASH_STR(name), sizeof(type))
@@ -162,47 +160,41 @@ extern Container_BuiltIn BuiltIn;
 #define TR_PARAM_VA "__*_VAMARK_*__"
 
 
-#define TRAIT_IMPL(traitName, typeName) \
-	TraitImpl_create(Trait_get(HASH_STR(traitName)), Type_get(HASH_STR(typeName)))
+#define TR_TRAIT_IMPL(traitName, typeName) TraitImpl_create(Trait_get(HASH_STR(traitName)), Type_get(HASH_STR(typeName)))
+#define TR_TRAIT_IMPL_METHOD(traitImpl, methodName, fn) TraitImpl_addMethod(traitImpl, Trait_getMethod(traitImpl->trait, HASH_STR(methodName)), fn)
 
-#define TRAIT_IMPL_METHOD(traitImpl, methodName, fn) \
-    TraitImpl_addMethod(traitImpl, Trait_getMethod(traitImpl->trait, HASH_STR(methodName)), fn)
-
-#define CALL(obj, methodName, ...) \
-	Object_callStr(obj, HASH_STR(methodName) __VA_OPT__(,) __VA_ARGS__)
-
-#define CALL_EX(obj, traitName, methodName, ...) \
-	Object_callStrEx(obj, HASH_STR(traitName), HASH_STR(methodName) __VA_OPT__(,) __VA_ARGS__)
+#define TR_OBJ_CALL(obj, methodName, ...) Object_callStr(obj, HASH_STR(methodName) __VA_OPT__(,) __VA_ARGS__)
+#define TR_OBJ_CALL_EX(obj, traitName, methodName, ...) Object_callStrEx(obj, HASH_STR(traitName), HASH_STR(methodName) __VA_OPT__(,) __VA_ARGS__)
 
 // =========================================
 // METHOD DEFINITION
 // =========================================
 
-#define METHOD_UNWRAP_START() \
+#define TR_METHOD_UNWRAP_START() \
 	CTX->object->data; \
 	unsigned int HIDDEN___count = 0\
 
-#define CHECK_TYPE(_type) \
+#define TR_CHECK_TYPE(_type) \
 	EXIT_IF_NOT(Type_equal(Object_getType(CTX->object), _type), "Type \"%s\" called this method expecting type \"%s\"", Object_getType(CTX->object)->name.str, _type->name.str)
-#define CHECK_TRAIT(_trait) \
+#define TR_CHECK_TRAIT(_trait) \
 	EXIT_IF_NOT(Trait_equal(CTX->trait, _trait), "Type \"%s\" called this method expecting type \"%s\"", CTX->trait->name.str, _trait->name.str)
-#define CHECK_METHOD(_method) \
+#define TR_CHECK_METHOD(_method) \
 	EXIT_IF_NOT(HashStr_equal(&CTX->method->name, &_method->name), "Method \"%s\" called but this method expect \"%s\"", CTX->method->name.str, _method->name.str)
-#define CHECK_METHOD_STR(_methodName) \
+#define TR_CHECK_METHOD_STR(_methodName) \
 	EXIT_IF_NOT(HashStr_equal(&CTX->method->name, &HASH_STR(_methodName)), "Method \"%s\" called but this method expect \"%s\"", CTX->method->name.str, _methodName)
 
-#define CHECK_ALL(_type, _trait, _method) \
-	CHECK_TYPE(_type); CHECK_TRAIT(_trait); CHECK_METHOD(_method)
+#define TR_CHECK_ALL(_type, _trait, _method) \
+	TR_CHECK_TYPE(_type); TR_CHECK_TRAIT(_trait); TR_CHECK_METHOD(_method)
 
-#define CHECK_TYPE_STR(_typeName) CHECK_TYPE(Type_get(HASH_STR(_typeName)))
-#define CHECK_TRAIT_STR(_traitName) CHECK_TRAIT(Trait_get(HASH_STR(_traitName)))
-#define CHECK_ALL_STR(_typeName, _traitName, _methodName) CHECK_TYPE_STR(_typeName); CHECK_TRAIT_STR(_traitName); CHECK_METHOD_STR(_methodName)
+#define TR_CHECK_TYPE_STR(_typeName) TR_CHECK_TYPE(Type_get(HASH_STR(_typeName)))
+#define TR_CHECK_TRAIT_STR(_traitName) TR_CHECK_TRAIT(Trait_get(HASH_STR(_traitName)))
+#define TR_CHECK_ALL_STR(_typeName, _traitName, _methodName) TR_CHECK_TYPE_STR(_typeName); TR_CHECK_TRAIT_STR(_traitName); TR_CHECK_METHOD_STR(_methodName)
 
 #define ARG_UNWRAP(type) \
 	va_arg(CTX->args, type); HIDDEN___count++;\
 	CTX->args = CTX->args/*Disable clang warn on clang mingw cause msvc require it to be not const*/ \
 
-#define METHOD_UNWRAP_END() \
+#define TR_METHOD_UNWRAP_END() \
 	EXIT_IF(HIDDEN___count != CTX->method->param_count, \
 		"Arg count declarated for Method \"%s\" differt from param unwrapping count for impl of Type \"%s\"", \
 		CTX->method->name.str, Object_getType(CTX->object)->name.str)

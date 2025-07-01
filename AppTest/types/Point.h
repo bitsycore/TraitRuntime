@@ -1,7 +1,7 @@
 #ifndef POINT_H
 #define POINT_H
 
-#include "../TraitRuntime.h"
+#include "../../TraitRuntime/TraitRuntime.h"
 
 extern Type* type_Point;
 

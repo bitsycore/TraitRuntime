@@ -3,8 +3,8 @@
 #include <string.h>
 #include <time.h>
 
-#include "common/Log.h"
-#include "TraitRuntime.h"
+#include <common/Log.h>
+#include <TraitRuntime.h>
 #include "traits/Describe.h"
 #include "traits/Move2i.h"
 #include "traits/Move3f.h"
@@ -27,9 +27,9 @@ void Describe_print(const Object* this) {
 // ===========================================================
 
 void* MethodImpl_Describe_UInt64_toString(MethodContext* CTX) {
-	const uint64_t this = *(uint64_t*) METHOD_UNWRAP_START();
-	CHECK_ALL_STR("UInt64", "Describe", "toString");
-	METHOD_UNWRAP_END();
+	const uint64_t this = *(uint64_t*) TR_METHOD_UNWRAP_START();
+	TR_CHECK_ALL_STR("UInt64", "Describe", "toString");
+	TR_METHOD_UNWRAP_END();
 	const char* template = "%s(%llu)";
 	const int len = snprintf(NULL, 0, template, Type_getById(CTX->object->type_id)->name.str, this);
 	char* buf = malloc(len + 1);
@@ -66,15 +66,15 @@ void do_work(void) {
 	LINE_BREAK();
 
 	Describe_print(instance_point);
-	CALL_EX(instance_point, "Move2i", "move", 3, 2);
-	CALL_EX(instance_point, "Move2i", "moveX", -12);
-	CALL_EX(instance_point, "Move2i", "moveY", 33);
-	CALL_EX(instance_point, "Move2i", "moveY", 123);
+	TR_OBJ_CALL_EX(instance_point, "Move2i", "move", 3, 2);
+	TR_OBJ_CALL_EX(instance_point, "Move2i", "moveX", -12);
+	TR_OBJ_CALL_EX(instance_point, "Move2i", "moveY", 33);
+	TR_OBJ_CALL_EX(instance_point, "Move2i", "moveY", 123);
 	Describe_print(instance_point);
-	CALL(instance_point, "move", 3, 2);
-	CALL(instance_point, "moveX", -12);
-	CALL(instance_point, "moveY", 33);
-	CALL(instance_point, "moveY", 123);
+	TR_OBJ_CALL(instance_point, "move", 3, 2);
+	TR_OBJ_CALL(instance_point, "moveX", -12);
+	TR_OBJ_CALL(instance_point, "moveY", 33);
+	TR_OBJ_CALL(instance_point, "moveY", 123);
 
 	LINE_BREAK();
 

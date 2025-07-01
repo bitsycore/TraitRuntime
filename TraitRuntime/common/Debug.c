@@ -1,4 +1,4 @@
-#include "debug.h"
+#include "Debug.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,12 +15,12 @@
 #include <windows.h>
 #include <dbghelp.h>
 
-char* print_call_stack() {
+char* get_callstack(const int skip_frames) {
 	void* stack[100];
 	void* process = GetCurrentProcess();
 	SymInitialize(process, NULL, TRUE);
 
-	const unsigned short frames = CaptureStackBackTrace(1, 100, stack, NULL);
+	const unsigned short frames = CaptureStackBackTrace(skip_frames, 100, stack, NULL);
 	SYMBOL_INFO* symbol = calloc(sizeof(SYMBOL_INFO) + 256 * sizeof(char), 1);
 	symbol->MaxNameLen = 255;
 	symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
@@ -36,7 +36,7 @@ char* print_call_stack() {
 
 	for (unsigned int i = 0; i < frames; i++) {
 		SymFromAddr(process, (DWORD64) (stack[i]), 0, symbol);
-		size_t needed = snprintf(NULL, 0, "  %i: %s - 0x%0X\n", frames - i - 1, symbol->Name,
+		const size_t needed = snprintf(NULL, 0, "  %i: %s - 0x%0X\n", frames - i - 1, symbol->Name,
 		                         (unsigned long) symbol->Address) + 1;
 		if (strlen(buffer) + needed >= buffer_size) {
 			buffer_size *= 2;
@@ -60,7 +60,7 @@ char* print_call_stack() {
 #else // MARK: MinGW && RELEASE
 // =====================================================================================================================
 
-char* print_call_stack() {
+char* get_callstack(int skip_frames) {
 	const char msg[] = "\n";
 	char* heap_msg = malloc(strlen(msg) + 1);
 	strcpy(heap_msg, msg);
@@ -78,13 +78,13 @@ char* print_call_stack() {
 #include <execinfo.h>
 #include <unistd.h>
 
-char* print_call_stack() {
+char* get_callstack() {
 	void* stack[100];
 	int frames = backtrace(stack, 100);
 	char** symbols = backtrace_symbols(stack, frames);
 
 	if (!symbols) {
-		return NULL; // backtrace_symbols failed
+		return NULL;
 	}
 
 	size_t buffer_size = 1024;

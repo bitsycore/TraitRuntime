@@ -1,7 +1,7 @@
 #ifndef MOVE3F_H
 #define MOVE3F_H
 
-#include "../TraitRuntime.h"
+#include "../../TraitRuntime/TraitRuntime.h"
 
 typedef struct {
 	Trait* trait;

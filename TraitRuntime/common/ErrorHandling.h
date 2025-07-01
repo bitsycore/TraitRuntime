@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
-// Keep for print_call_stack()
+// Keep for get_callstack()
 #include "Debug.h"
 
 #ifndef NDEBUG
@@ -36,7 +36,7 @@ static inline void _eh___handle_error(
     fprintf(stderr, "\nFile: %s:%d\nFunction: %s\n", file, line, func_name);
 
     // Get and print the callstack if available
-    char* callstack = print_call_stack();
+    char* callstack = get_callstack(2);
     if (callstack && callstack[0] != '\n' && callstack[0] != '\0') {
         fprintf(stderr, "Callstack:\n%s", callstack);
     }

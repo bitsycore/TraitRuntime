@@ -1,7 +1,7 @@
-#ifndef DISPLAY_H
-#define DISPLAY_H
+#ifndef DESCRIBE_H
+#define DESCRIBE_H
 
-#include "../TraitRuntime.h"
+#include "../../TraitRuntime/TraitRuntime.h"
 
 typedef struct {
     Trait* trait;
@@ -14,4 +14,4 @@ extern Container_Describe Describe;
 
 void Describe_loadTrait();
 
-#endif //DISPLAY_H
+#endif //DESCRIBE_H

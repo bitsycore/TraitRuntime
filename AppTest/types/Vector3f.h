@@ -1,7 +1,7 @@
 #ifndef VECTOR3F_H
 #define VECTOR3F_H
 
-#include "../TraitRuntime.h"
+#include "../../TraitRuntime/TraitRuntime.h"
 
 extern Type* type_Vector3f;
 

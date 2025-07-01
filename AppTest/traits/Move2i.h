@@ -1,7 +1,7 @@
 #ifndef MOVE2I_H
 #define MOVE2I_H
 
-#include "../TraitRuntime.h"
+#include "../../TraitRuntime/TraitRuntime.h"
 
 typedef struct {
     Trait* trait;
