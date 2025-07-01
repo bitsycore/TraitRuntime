@@ -7,8 +7,8 @@ add_executable(TraitRuntime
         main.c
         TraitRuntime.c
         TraitRuntime.h
-        HashStr.c
-        HashStr.h
+        string/HashStr.c
+        string/HashStr.h
         types/Point.c
         types/Point.h
         types/Vector3f.c
@@ -22,8 +22,8 @@ add_executable(TraitRuntime
         common/ErrorHandling.h
         common/Debug.c
         common/Debug.h
-        Log.h
-        Log.c
+        common/Log.h
+        common/Log.c
         common/MacroUtils.h
 )
 

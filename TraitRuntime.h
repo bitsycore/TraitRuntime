@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "HashStr.h"
+#include "string/HashStr.h"
 #include "common/MacroUtils.h"
 #include "common/ErrorHandling.h"
 
@@ -19,7 +19,12 @@
 #define MAX_METHODS_PER_TRAITS 8
 #define MAX_PARAMS_PER_METHODS 8
 
+struct Object;
+struct Type;
 struct Trait;
+struct TraitImpl;
+struct Method;
+struct MethodContext;
 
 typedef struct {
 	HashStr name;

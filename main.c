@@ -3,7 +3,7 @@
 #include <string.h>
 #include <time.h>
 
-#include "Log.h"
+#include "common/Log.h"
 #include "TraitRuntime.h"
 #include "traits/Format.h"
 #include "traits/Move2i.h"

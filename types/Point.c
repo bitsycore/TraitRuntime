@@ -3,7 +3,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#include "../Log.h"
+#include "../common/Log.h"
 #include "../traits/Format.h"
 #include "../traits/Move2i.h"
 

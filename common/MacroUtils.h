@@ -31,7 +31,7 @@ _31,_32,_33,_34,_35,_36,_37,_38,_39,_40,N,\
 // #define FUN_1(x,...) "fun_1"
 // #define FUN_2(x, y, ...) "fun_2"
 // #define FUN(...) MU_GET_MACRO_3(_, ##__VA_ARGS__, FUN_2, FUN_1, FUN_0)(__VA_ARGS__)
-//                                  ^-- Leading placeholder allows correct dispatch when __VA_ARGS__ is empty
+                                /* ^-- Leading placeholder allows correct dispatch when __VA_ARGS__ is empty */
 
 // ----------------------------------------------------
 // First param required, rest optional.
@@ -85,7 +85,7 @@ _31,_32,_33,_34,_35,_36,_37,_38,_39,_40,N,\
 #define MU_GET_MACRO_41(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, _23, _24, _25, _26, _27, _28, _29, _30, _31, _32, _33, _34, _35, _36, _37, _38, _39, _40, _41, NAME, ...) NAME
 
 #define _______MU_MAP0(m,x1)
-#define _______MU_MAP1(m,x1,...)  m(x1), _______MU_MAP0(m,__VA_ARGS__)
+#define _______MU_MAP1(m,x1,...)  m(x1)  _______MU_MAP0(m,__VA_ARGS__)
 #define _______MU_MAP2(m,x1,...)  m(x1), _______MU_MAP1(m,__VA_ARGS__)
 #define _______MU_MAP3(m,x1,...)  m(x1), _______MU_MAP2(m,__VA_ARGS__)
 #define _______MU_MAP4(m,x1,...)  m(x1), _______MU_MAP3(m,__VA_ARGS__)
