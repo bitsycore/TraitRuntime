@@ -327,7 +327,7 @@ MethodImpl Object_getMethod(const Object* obj, const HashStr trait_name, const H
 	return TraitImpl_getMethodImpl(impl, method_name);
 }
 
-static void* INTERNAL_Object_call(const Object* obj, const Method* trait_method, const Trait* trait, const TraitImpl* trait_impl, const va_list* args) {
+static void* INTERNAL_Object_call(const Object* obj, const Method* trait_method, const Trait* trait, const TraitImpl* trait_impl, va_list* args) {
 	EXIT_IF(obj == NULL, "param obj cannot be NULL");
 	EXIT_IF(trait == NULL, "param trait cannot be NULL");
 	EXIT_IF(trait_method == NULL, "param trait method cannot be NULL");
