@@ -327,7 +327,7 @@ MethodImpl Object_getMethod(const Object* obj, const HashStr trait_name, const H
 	return TraitImpl_getMethodImpl(impl, method_name);
 }
 
-static void* INTERNAL_Object_call(const Object* obj, const Method* trait_method, const Trait* trait, const TraitImpl* trait_impl, const va_list args) {
+static void* INTERNAL_Object_call(const Object* obj, const Method* trait_method, const Trait* trait, const TraitImpl* trait_impl, const va_list* args) {
 	EXIT_IF(obj == NULL, "param obj cannot be NULL");
 	EXIT_IF(trait == NULL, "param trait cannot be NULL");
 	EXIT_IF(trait_method == NULL, "param trait method cannot be NULL");
@@ -347,7 +347,7 @@ void* Object_callStr(const Object* obj, const HashStr method_name, ...) {
 
 	va_list args;
 	va_start(args, method_name);
-	void* result = INTERNAL_Object_call(obj, method, trait_impl->trait, trait_impl, args);
+	void* result = INTERNAL_Object_call(obj, method, trait_impl->trait, trait_impl, &args);
 	va_end(args);
 
 	return result;
@@ -362,7 +362,7 @@ void* Object_callStrEx(const Object* obj, const HashStr trait_name, const HashSt
 
 	va_list args;
 	va_start(args, method_name);
-	void* result = INTERNAL_Object_call(obj, trait_method, trait, trait_impl, args);
+	void* result = INTERNAL_Object_call(obj, trait_method, trait, trait_impl, &args);
 	va_end(args);
 
 	return result;
@@ -377,7 +377,7 @@ void* Object_call(const Object* obj, const Method* method, ...) {
 
 	va_list args;
 	va_start(args, method);
-	void* result = INTERNAL_Object_call(obj, method, trait, trait_impl, args);
+	void* result = INTERNAL_Object_call(obj, method, trait, trait_impl, &args);
 	va_end(args);
 
 	return result;

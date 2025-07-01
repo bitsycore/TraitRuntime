@@ -56,7 +56,7 @@ typedef struct MethodContext {
 	const Object* object;
 	const Trait* trait;
 	const Method* method;
-	va_list args;
+	va_list* args;
 } MethodContext;
 
 typedef void* (*MethodImpl)(MethodContext* CTX);
@@ -192,7 +192,7 @@ extern Container_BuiltIn BuiltIn;
 #define TR_CHECK_ALL_STR(_typeName, _traitName, _methodName) TR_CHECK_TYPE_STR(_typeName); TR_CHECK_TRAIT_STR(_traitName); TR_CHECK_METHOD_STR(_methodName)
 
 #define ARG_UNWRAP(type) \
-	va_arg(CTX->args, type); HIDDEN___count++\
+	va_arg(*CTX->args, type); HIDDEN___count++\
 
 #define TR_METHOD_UNWRAP_END() \
 	EXIT_IF(HIDDEN___count != CTX->method->params_count, \
