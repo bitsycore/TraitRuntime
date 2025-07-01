@@ -2,14 +2,17 @@
 // Created by DWA on 01/07/2025.
 //
 
+#include <stddef.h>
 #include "MemPool.h"
+
+#include "MaxAlign.h"
 
 // ===========================================================
 // MARK: INTERNAL UTILITIES
 // ===========================================================
 
 static size_t align_up(const size_t x) {
-    return x + (ALIGN - 1) & ~(ALIGN - 1);
+    return x + (TRM_MAX_ALIGN - 1) & ~(TRM_MAX_ALIGN - 1);
 }
 
 static int size_class(size_t size) {
@@ -41,7 +44,7 @@ static void remove_block(MemBucket* a, MemBlock* b, const int class) {
 }
 
 static void split_block(MemBucket* a, MemBlock* b, const size_t size) {
-    if (b->size < size + HEADER_SIZE + ALIGN) return;
+    if (b->size < size + HEADER_SIZE + TRM_MAX_ALIGN) return;
     MemBlock* newb = (MemBlock*)((uint8_t*)b + HEADER_SIZE + size);
     newb->size = b->size - size - HEADER_SIZE;
     newb->free = true;

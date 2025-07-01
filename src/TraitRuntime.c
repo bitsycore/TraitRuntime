@@ -35,8 +35,13 @@ static size_t POOL_TRAIT_IMPL_COUNT = 0;
 // =====================================
 
 static void INTERNAL_initialize_built_in_traits_and_types(void) {
-	const size_t arena_size = Arena_requiredSize(64 * 1024 * 1024);
-	Arena* arena = Arena_init(malloc(arena_size), arena_size);
+	TR_REPEAT(50) {
+		const size_t arena_size = Arena_requiredSize(it * 64 * 1024 * 1024);
+		Arena* arena = Arena_init(malloc(arena_size), arena_size);
+		void* buffer = Arena_alloc(arena, sizeof(Container_BuiltIn));
+		Arena_reset(arena);
+		free(Arena_buffer(arena));
+	}
 
 	BuiltIn.traits.Finalizable.trait = TR_TRAIT("Finalizable");
 	BuiltIn.traits.Finalizable.methods.finalize = Trait_addMethod(BuiltIn.traits.Finalizable.trait, HASH_STR("finalize"), TR_PARAMS());

@@ -204,6 +204,6 @@ extern Container_BuiltIn BuiltIn;
 // =========================================
 
 #define TR_USE(T, traitName) for (T * it = traitName; it != NULL; it = NULL)
-#define TR_REPEAT(count) for (unsigned int i = 0; i < count; i++)
+#define TR_REPEAT(count) for (unsigned int it = 0; it < count; it++)
 
 #endif

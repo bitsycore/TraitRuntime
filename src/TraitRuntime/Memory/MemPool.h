@@ -5,14 +5,13 @@
 #ifndef SEGREGATEDFREELISTARENA_H
 #define SEGREGATEDFREELISTARENA_H
 
-#include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
-#include <string.h>
 
-#define ALIGN sizeof(max_align_t)
+#include "MaxAlign.h"
+
 #define MAX_CLASSES 12
-#define HEADER_SIZE ((sizeof(MemBlock) + (ALIGN - 1)) & ~(ALIGN - 1))
+#define HEADER_SIZE ((sizeof(MemBlock) + (TRM_MAX_ALIGN - 1)) & ~(TRM_MAX_ALIGN - 1))
 
 typedef struct MemBlock {
     size_t size;
