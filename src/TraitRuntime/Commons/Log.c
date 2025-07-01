@@ -28,7 +28,7 @@ static void enableWindowsAnsiSupport() {
 }
 #endif
 
-const char* levelToString(const LogLevel level) {
+static const char* levelToString(const LogLevel level) {
 	switch (level) {
 		case DEBUG: return BLUE "DEBUG" RESET;
 		case INFO: return GREEN "INFO" RESET;
@@ -38,7 +38,7 @@ const char* levelToString(const LogLevel level) {
 	}
 }
 
-void send_log(const LogLevel level, const char* format, ...) {
+void Log_send(const LogLevel level, const char* format, ...) {
 #ifdef _WIN32
 	static int initialized = 0;
 	if (!initialized) {
