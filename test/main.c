@@ -3,20 +3,20 @@
 #include <string.h>
 #include <time.h>
 
-#include <common/Log.h>
 #include <TraitRuntime.h>
+#include <TraitRuntime/Commons/Log.h>
 #include "traits/Describe.h"
 #include "traits/Move2i.h"
 #include "traits/Move3f.h"
-#include "types/Point.h"
-#include "types/Vector3f.h"
+#include "classes/Point.h"
+#include "classes/Vector3f.h"
 
 // ===========================================================
 // Using Any Describe
 // ===========================================================
 
 void Describe_print(const Object* this) {
-	const char* objToString = Object_call(this, Describe.methods.toString);
+	const char* objToString = Object_call(this, trDescribe.methods.toString);
 	LOG("toString: %s\n", objToString);
 	free((void*)objToString);
 	objToString = NULL;
@@ -38,21 +38,21 @@ void* MethodImpl_Describe_UInt64_toString(MethodContext* CTX) {
 }
 
 void printObjInfo(const Object* instance_point) {
-	const Type* type = Object_getType(instance_point);
+	const Class* type = Object_getType(instance_point);
 	LOG("Object is of type: %s\n", type->name.str);
 	LOG("Object data size: %zu\n", type->size);
-	LOG("Point implement Describe = %d\n", Type_implement(type, Describe.trait));
-	LOG("Point implement Move2i = %d\n", Type_implement(type, Move2i.trait));
-	LOG("Point implement Move3f = %d\n", Type_implement(type, Move3f.trait));
+	LOG("Point implement Describe = %d\n", Type_implement(type, trDescribe.trait));
+	LOG("Point implement Move2i = %d\n", Type_implement(type, trMove2i.trait));
+	LOG("Point implement Move3f = %d\n", Type_implement(type, trMove3f.trait));
 }
 
 void do_work(void) {
-	Object* instance_point = Object_new(type_Point);
+	Object* instance_point = Object_new(clsPoint);
 	printObjInfo(instance_point);
 
 	LINE_BREAK();
 
-	Object* instance_vector3f = Object_new(type_Vector3f);
+	Object* instance_vector3f = Object_new(clsVector3f);
 	printObjInfo(instance_vector3f);
 
 	LINE_BREAK();
@@ -79,10 +79,10 @@ void do_work(void) {
 	LINE_BREAK();
 
 	Describe_print(instance_vector3f);
-	Object_call(instance_vector3f, Move3f.methods.move, 1.0f, 2.0f, 3.0f);
-	Object_call(instance_vector3f, Move3f.methods.moveY, -12.0f);
-	Object_call(instance_vector3f, Move3f.methods.moveZ, 33.0f);
-	Object_call(instance_vector3f, Move3f.methods.moveX, -66.0f);
+	Object_call(instance_vector3f, trMove3f.methods.move, 1.0f, 2.0f, 3.0f);
+	Object_call(instance_vector3f, trMove3f.methods.moveY, -12.0f);
+	Object_call(instance_vector3f, trMove3f.methods.moveZ, 33.0f);
+	Object_call(instance_vector3f, trMove3f.methods.moveX, -66.0f);
 	Describe_print(instance_vector3f);
 
 	LINE_BREAK();
@@ -114,8 +114,8 @@ int main() {
 
 	// =====================================================================
 	// Impl Traits for Uint64
-	TraitImpl* traitImpl_Describe_UInt64 = TraitImpl_create(Describe.trait, BuiltIn.types.UInt64);
-	TraitImpl_addMethod(traitImpl_Describe_UInt64, Describe.methods.toString, MethodImpl_Describe_UInt64_toString);
+	TraitImpl* traitImpl_Describe_UInt64 = TraitImpl_create(trDescribe.trait, BuiltIn.types.UInt64);
+	TraitImpl_addMethod(traitImpl_Describe_UInt64, trDescribe.methods.toString, MethodImpl_Describe_UInt64_toString);
 
 	const clock_t end = clock();
 	const double time_spent = (double)(end - start) / CLOCKS_PER_SEC;

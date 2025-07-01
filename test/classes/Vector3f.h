@@ -1,12 +1,12 @@
 #ifndef VECTOR3F_H
 #define VECTOR3F_H
 
-#include "../../TraitRuntime/TraitRuntime.h"
+#include <TraitRuntime.h>
 
-extern Type* type_Vector3f;
+extern Class* clsVector3f;
 
 typedef struct {
-    Type* type;
+    Class* type;
 } Vector3f;
 
 typedef struct {

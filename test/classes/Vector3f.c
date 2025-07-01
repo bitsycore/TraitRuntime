@@ -3,26 +3,26 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#include "../../TraitRuntime/common/ErrorHandling.h"
+#include <TraitRuntime/Commons/ErrorHandling.h>
 #include "../traits/Describe.h"
 #include "../traits/Move3f.h"
 
-Type* type_Vector3f;
+Class* clsVector3f;
 
 // ===========================================================
 // METHODS
 // ===========================================================
 
 void Vector3f_initType() {
-	type_Vector3f = TR_TYPE("Vector3f", Data_Vector3f);
-	TraitImpl* traitImpl_Describe_Vector3f = TraitImpl_create(Describe.trait, type_Vector3f);
-	TraitImpl_addMethod(traitImpl_Describe_Vector3f, Describe.methods.toString, MethodImpl_Vector3f_Describe_toString);
+	clsVector3f = TR_TYPE("Vector3f", Data_Vector3f);
+	TraitImpl* traitImpl_Describe_Vector3f = TraitImpl_create(trDescribe.trait, clsVector3f);
+	TraitImpl_addMethod(traitImpl_Describe_Vector3f, trDescribe.methods.toString, MethodImpl_Vector3f_Describe_toString);
 
-	TR_USE(TraitImpl, TraitImpl_create(Move3f.trait, type_Vector3f)) {
-		TraitImpl_addMethod(it, Move3f.methods.move, MethodImpl_Move3f_Vector3f_move);
-		TraitImpl_addMethod(it, Move3f.methods.moveX, MethodImpl_Move3f_Vector3f_moveX);
-		TraitImpl_addMethod(it, Move3f.methods.moveY, MethodImpl_Move3f_Vector3f_moveY);
-		TraitImpl_addMethod(it, Move3f.methods.moveZ, MethodImpl_Move3f_Vector3f_moveZ);
+	TR_USE(TraitImpl, TraitImpl_create(trMove3f.trait, clsVector3f)) {
+		TraitImpl_addMethod(it, trMove3f.methods.move, MethodImpl_Move3f_Vector3f_move);
+		TraitImpl_addMethod(it, trMove3f.methods.moveX, MethodImpl_Move3f_Vector3f_moveX);
+		TraitImpl_addMethod(it, trMove3f.methods.moveY, MethodImpl_Move3f_Vector3f_moveY);
+		TraitImpl_addMethod(it, trMove3f.methods.moveZ, MethodImpl_Move3f_Vector3f_moveZ);
 	}
 
 }
@@ -32,7 +32,7 @@ void* MethodImpl_Vector3f_Describe_toString(MethodContext* CTX) {
 	TR_CHECK_ALL_STR("Vector3f", "Describe", "toString");
 	TR_METHOD_UNWRAP_END();
 	const char* template = "%s(x=%f, y=%f, z=%f)";
-	const Type* type = Object_getType(CTX->object);
+	const Class* type = Object_getType(CTX->object);
 	const int len = snprintf(NULL, 0, template, type->name.str, this->x, this->y, this->z);
 	char* buf = malloc(len + 1);
 	snprintf(buf, len + 1, template, type->name.str, this->x, this->y, this->z);

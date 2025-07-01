@@ -1,9 +1,9 @@
 #ifndef POINT_H
 #define POINT_H
 
-#include "../../TraitRuntime/TraitRuntime.h"
+#include <TraitRuntime.h>
 
-extern Type* type_Point;
+extern Class* clsPoint;
 
 typedef struct {
 	int x, y;

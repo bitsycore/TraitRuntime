@@ -1,38 +1,39 @@
 cmake_minimum_required(VERSION 3.31)
-project(TraitRuntime C)
+project(src C)
 
 set(CMAKE_C_STANDARD 11)
 
 add_library(TraitRuntime
-        TraitRuntime/TraitRuntime.c
-        TraitRuntime/TraitRuntime.h
-        TraitRuntime/string/HashStr.c
-        TraitRuntime/string/HashStr.h
-        TraitRuntime/common/ErrorHandling.h
-        TraitRuntime/common/Debug.c
-        TraitRuntime/common/Debug.h
-        TraitRuntime/common/Log.h
-        TraitRuntime/common/Log.c
-        TraitRuntime/common/MacroUtils.h
+        src/TraitRuntime.c
+        src/TraitRuntime.h
+        src/TraitRuntime/String/HashStr.c
+        src/TraitRuntime/String/HashStr.h
+        src/TraitRuntime/Commons/ErrorHandling.h
+        src/TraitRuntime/Commons/Debug.c
+        src/TraitRuntime/Commons/Debug.h
+        src/TraitRuntime/Commons/Log.h
+        src/TraitRuntime/Commons/Log.c
+        src/TraitRuntime/Commons/MacroUtils.h
 )
 
 add_executable(AppTest
-        AppTest/main.c
-        AppTest/types/Point.c
-        AppTest/types/Point.h
-        AppTest/types/Vector3f.c
-        AppTest/types/Vector3f.h
-        AppTest/traits/Describe.c
-        AppTest/traits/Describe.h
-        AppTest/traits/Move2i.c
-        AppTest/traits/Move2i.h
-        AppTest/traits/Move3f.c
-        AppTest/traits/Move3f.h
+        test/main.c
+        test/classes/Point.c
+        test/classes/Point.h
+        test/classes/Vector3f.c
+        test/classes/Vector3f.h
+        test/traits/Describe.c
+        test/traits/Describe.h
+        test/traits/Move2i.c
+        test/traits/Move2i.h
+        test/traits/Move3f.c
+        test/traits/Move3f.h
 )
 
-target_include_directories(AppTest PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/TraitRuntime)
+target_include_directories(TraitRuntime PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_link_libraries(AppTest PRIVATE TraitRuntime)
 
+# For TraitRuntime/Commons/Debug.c when on MSVC compiler
 if (MSVC AND CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_link_libraries(TraitRuntime PRIVATE Dbghelp)
 endif()

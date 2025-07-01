@@ -1,7 +1,7 @@
 #ifndef MOVE3F_H
 #define MOVE3F_H
 
-#include "../../TraitRuntime/TraitRuntime.h"
+#include <TraitRuntime.h>
 
 typedef struct {
 	Trait* trait;
@@ -13,7 +13,7 @@ typedef struct {
 	} methods;
 } Container_Move3f;
 
-extern Container_Move3f Move3f;
+extern Container_Move3f trMove3f;
 
 void Move3f_loadTrait();
 

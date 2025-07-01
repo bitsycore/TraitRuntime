@@ -3,7 +3,7 @@
 #include <assert.h>
 #include <stdbool.h>
 #include <string.h>
-#include "common/ErrorHandling.h"
+#include "TraitRuntime/Commons/ErrorHandling.h"
 
 #define private static
 
@@ -19,7 +19,7 @@ Container_BuiltIn BuiltIn;
 
 static bool IS_INIT = false;
 
-static Type* POOL_TYPE[MAX_TYPE];
+static Class* POOL_TYPE[MAX_TYPE];
 static size_t POOL_TYPE_COUNT = 0;
 
 static Trait* POOL_TRAIT[MAX_TRAITS];
@@ -87,10 +87,10 @@ void TraitRuntime_clean() {
 // MARK: TYPE
 // =====================================
 
-Type* Type_create(const HashStr name, const size_t size) {
+Class* Type_create(const HashStr name, const size_t size) {
 	EXIT_IF_NOT(POOL_TYPE_COUNT < MAX_TYPE, "Can't create Type \"%s\", Max number of Type created in TraitRuntime", name.str);
 
-	Type* t = malloc(sizeof(Type));
+	Class* t = malloc(sizeof(Class));
 	t->name = name;
 	t->size = size;
 	t->id = POOL_TYPE_COUNT;
@@ -99,7 +99,7 @@ Type* Type_create(const HashStr name, const size_t size) {
 	return t;
 }
 
-Type* Type_get(const HashStr name) {
+Class* Type_get(const HashStr name) {
 	for (size_t i = 0; i < POOL_TYPE_COUNT; ++i) {
 		if (HashStr_equal(&POOL_TYPE[i]->name, &name) == true) {
 			return POOL_TYPE[i];
@@ -109,18 +109,18 @@ Type* Type_get(const HashStr name) {
 	return NULL;
 }
 
-Type* Type_getById(const size_t id) {
+Class* Type_getById(const size_t id) {
 	EXIT_IF(id >= POOL_TYPE_COUNT, "Can't find type with id %zu", id);
 	return POOL_TYPE[id];
 }
 
-bool Type_equal(const Type* this, const Type* other) {
+bool Type_equal(const Class* this, const Class* other) {
 	if (this == other) return true;
 	if (HashStr_equal(&this->name, &other->name)) return true;
 	return false;
 }
 
-bool Type_implement(const Type* type, const Trait* trait) {
+bool Type_implement(const Class* type, const Trait* trait) {
 	if (type == NULL || trait == NULL) return false;
 	return Type_implementById(type->id, trait);
 }
@@ -198,12 +198,12 @@ Method* Trait_addMethod(Trait* trait, const HashStr method_name, const HashStr* 
 
 	Method* m = &trait->methods[trait->method_count++];
 	m->name = method_name;
-	m->param_count = param_count;
+	m->params_count = param_count;
 	m->param_vararg_at = -1;
 	m->trait = (struct Trait*)trait;
 	if (param_types != NULL) {
 		for (size_t i = 0; i < param_count; ++i) {
-			m->param_types[i] = param_types[i];
+			m->params[i] = param_types[i];
 		}
 	}
 
@@ -232,7 +232,7 @@ Method* Trait_getMethod(const Trait* trait, const HashStr method_name) {
 // MARK: TRAIT IMPL
 // =====================================
 
-TraitImpl* TraitImpl_create(Trait* trait, Type* type) {
+TraitImpl* TraitImpl_create(Trait* trait, Class* type) {
 	EXIT_IF(trait == NULL, "param trait cannot be NULL");
 	EXIT_IF(type == NULL, "param type cannot be NULL");
 	EXIT_IF_NOT(POOL_TRAIT_IMPL_COUNT < MAX_TRAIT_IMPLS, "Cannot create TraitImpl \"%s\" for Type \"%s\"", trait->name.str, type->name.str);
@@ -296,7 +296,7 @@ MethodImpl TraitImpl_getMethodImpl(const TraitImpl* trait_impl, const HashStr me
 // MARK: OBJECT
 // =====================================
 
-Object* Object_newFrom(const Type* type, void* data) {
+Object* Object_newFrom(const Class* type, void* data) {
 	EXIT_IF(type == NULL, "param type cannot be NULL");
 	Object* obj = malloc(sizeof(Object));
 	obj->type_id = type->id;
@@ -307,7 +307,7 @@ Object* Object_newFrom(const Type* type, void* data) {
 	return obj;
 }
 
-Object* Object_new(const Type* type) {
+Object* Object_new(const Class* type) {
 	EXIT_IF(type == NULL, "param type cannot be NULL");
 	return Object_newFrom(type, calloc(1, type->size));
 }
@@ -375,12 +375,12 @@ void* Object_call(const Object* obj, const Method* method, ...) {
 	return result;
 }
 
-Type* Object_getType(const Object* obj) {
+Class* Object_getType(const Object* obj) {
 	EXIT_IF(obj == NULL, "param obj cannot be NULL");
 	return Type_getById(obj->type_id);
 }
 
-bool Object_is(const Object* obj, const Type* type) {
+bool Object_is(const Object* obj, const Class* type) {
 	if (obj == NULL || type == NULL) return false;
 	return obj->type_id == type->id;
 }

@@ -6,9 +6,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "string/HashStr.h"
-#include "common/MacroUtils.h"
-#include "common/ErrorHandling.h"
+#include "TraitRuntime/String/HashStr.h"
+#include "TraitRuntime/Commons/MacroUtils.h"
+#include "TraitRuntime/Commons/ErrorHandling.h"
 
 #define ENABLE_BUILTIN true
 
@@ -17,42 +17,42 @@
 #define MAX_TRAIT_IMPLS ((MAX_TYPE * MAX_TRAITS) / 2)
 
 #define MAX_METHODS_PER_TRAITS 8
-#define MAX_PARAMS_PER_METHODS 5
+#define MAX_PARAMS_PER_METHODS 8
 
+struct Class;
 struct Object;
-struct Type;
 struct Trait;
 struct TraitImpl;
 struct Method;
 struct MethodContext;
 
-typedef struct {
+typedef struct Class {
 	HashStr name;
 	size_t size;
 	size_t id;
-} Type;
+} Class;
 
-typedef struct {
+typedef struct Object {
 	size_t type_id;
 	void* data;
 } Object;
 
-typedef struct {
+typedef struct Method {
 	HashStr name;
-	HashStr param_types[MAX_PARAMS_PER_METHODS];
-	size_t param_count;
+	HashStr params[MAX_PARAMS_PER_METHODS];
+	size_t params_count;
 	size_t param_vararg_at;
 	struct Trait* trait;
 } Method;
 
-typedef struct {
+typedef struct Trait {
 	HashStr name;
 	Method methods[MAX_METHODS_PER_TRAITS];
 	size_t method_count;
 	size_t data_size;
 } Trait;
 
-typedef struct {
+typedef struct MethodContext {
 	const Object* object;
 	const Trait* trait;
 	const Method* method;
@@ -61,7 +61,7 @@ typedef struct {
 
 typedef void* (*MethodImpl)(MethodContext* CTX);
 
-typedef struct {
+typedef struct TraitImpl {
 	size_t type_id;
 	Trait* trait;
 	MethodImpl methods[MAX_METHODS_PER_TRAITS];
@@ -74,12 +74,12 @@ void TraitRuntime_clean();
 
 // ===================================
 // Type
-Type* Type_create(HashStr name, size_t size);
-Type* Type_get(HashStr name);
-Type* Type_getById(size_t id);
-bool Type_implement(const Type* type, const Trait* trait);
+Class* Type_create(HashStr name, size_t size);
+Class* Type_get(HashStr name);
+Class* Type_getById(size_t id);
+bool Type_implement(const Class* type, const Trait* trait);
 bool Type_implementById(size_t id, const Trait* trait);
-bool Type_equal(const Type* this, const Type* other);
+bool Type_equal(const Class* this, const Class* other);
 
 // ===================================
 // Trait
@@ -91,23 +91,23 @@ bool Trait_equal(const Trait* this, const Trait* other);
 
 // ===================================
 // TraitImpl
-TraitImpl* TraitImpl_create(Trait* trait, Type* type);
+TraitImpl* TraitImpl_create(Trait* trait, Class* type);
 void TraitImpl_addMethod(TraitImpl* trait_impl, const Method* method, MethodImpl method_impl);
 TraitImpl* TraitImpl_get(size_t type_id, const Trait* trait);
 MethodImpl TraitImpl_getMethodImpl(const TraitImpl* trait_impl, HashStr method_name);
 
 // ===================================
 // Object
-Object* Object_new(const Type* type);
-Object* Object_newFrom(const Type* type, void* data);
+Object* Object_new(const Class* type);
+Object* Object_newFrom(const Class* type, void* data);
 MethodImpl Object_getMethod(const Object* obj, HashStr trait_name, HashStr method_name);
-bool Object_is(const Object* obj, const Type* type);
+bool Object_is(const Object* obj, const Class* type);
 bool Object_implement(const Object* obj, const Trait* trait);
 void Object_destroy(Object* obj);
 void* Object_call(const Object* obj, const Method* method, ...);
 void* Object_callStrEx(const Object* obj, HashStr trait_name, HashStr method_name, ... );
 void* Object_callStr(const Object* obj, HashStr method_name, ... );
-Type* Object_getType(const Object* obj);
+Class* Object_getType(const Object* obj);
 
 // ======================================================================================
 // BUILT IN TYPE
@@ -115,16 +115,16 @@ Type* Object_getType(const Object* obj);
 
 typedef struct {
 	struct {
-		Type* UInt8;
-		Type* UInt16;
-		Type* UInt32;
-		Type* UInt64;
-		Type* Int8;
-		Type* Int16;
-		Type* Int32;
-		Type* Int64;
-		Type* Float32;
-		Type* Float64;
+		Class* UInt8;
+		Class* UInt16;
+		Class* UInt32;
+		Class* UInt64;
+		Class* Int8;
+		Class* Int16;
+		Class* Int32;
+		Class* Int64;
+		Class* Float32;
+		Class* Float64;
 	} types;
 	struct {
 		struct {
@@ -195,7 +195,7 @@ extern Container_BuiltIn BuiltIn;
 	CTX->args = CTX->args/*Disable clang warn on clang mingw cause msvc require it to be not const*/ \
 
 #define TR_METHOD_UNWRAP_END() \
-	EXIT_IF(HIDDEN___count != CTX->method->param_count, \
+	EXIT_IF(HIDDEN___count != CTX->method->params_count, \
 		"Arg count declarated for Method \"%s\" differt from param unwrapping count for impl of Type \"%s\"", \
 		CTX->method->name.str, Object_getType(CTX->object)->name.str)
 

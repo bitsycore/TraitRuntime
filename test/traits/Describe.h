@@ -1,7 +1,7 @@
 #ifndef DESCRIBE_H
 #define DESCRIBE_H
 
-#include "../../TraitRuntime/TraitRuntime.h"
+#include <TraitRuntime.h>
 
 typedef struct {
     Trait* trait;
@@ -10,7 +10,7 @@ typedef struct {
     } methods;
 } Container_Describe;
 
-extern Container_Describe Describe;
+extern Container_Describe trDescribe;
 
 void Describe_loadTrait();
 

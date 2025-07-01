@@ -1,7 +1,7 @@
 #ifndef MOVE2I_H
 #define MOVE2I_H
 
-#include "../../TraitRuntime/TraitRuntime.h"
+#include <TraitRuntime.h>
 
 typedef struct {
     Trait* trait;
@@ -12,7 +12,7 @@ typedef struct {
     } methods;
 } Container_Move2i;
 
-extern Container_Move2i Move2i;
+extern Container_Move2i trMove2i;
 
 void Move2i_loadTrait();
 

@@ -3,11 +3,13 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#include <common/Log.h>
+#include <TraitRuntime.h>
+#include <TraitRuntime/Commons/Log.h>
+
 #include "../traits/Describe.h"
 #include "../traits/Move2i.h"
 
-Type* type_Point;
+Class* clsPoint;
 
 // ===========================================================
 // Impl Finalizable
@@ -36,20 +38,20 @@ void* Point_MethodImpl_Constructable_construct(MethodContext* CTX) {
 // ===========================================================
 
 void Point_initType(void) {
-	type_Point = TR_TYPE("Point", DataPoint);
-	TraitImpl* traitImpl_Describe_Point = TraitImpl_create(Describe.trait, type_Point);
-	TraitImpl_addMethod(traitImpl_Describe_Point, Describe.methods.toString, Point_MethodImpl_Describe_toString);
+	clsPoint = TR_TYPE("Point", DataPoint);
+	TraitImpl* traitImpl_Describe_Point = TraitImpl_create(trDescribe.trait, clsPoint);
+	TraitImpl_addMethod(traitImpl_Describe_Point, trDescribe.methods.toString, Point_MethodImpl_Describe_toString);
 
-	TR_USE(TraitImpl, TraitImpl_create(Move2i.trait, type_Point)) {
+	TR_USE(TraitImpl, TraitImpl_create(trMove2i.trait, clsPoint)) {
 		TR_TRAIT_IMPL_METHOD(it, "move", Point_MethodImpl_Move2i_move);
 		TR_TRAIT_IMPL_METHOD(it, "moveX", Point_MethodImpl_Move2i_moveX);
 		TR_TRAIT_IMPL_METHOD(it, "moveY", Point_MethodImpl_Move2i_moveY);
 	}
 
-	TraitImpl* traitImpl_Finalizable_Point = TraitImpl_create(BuiltIn.traits.Finalizable.trait, type_Point);
+	TraitImpl* traitImpl_Finalizable_Point = TraitImpl_create(BuiltIn.traits.Finalizable.trait, clsPoint);
 	TraitImpl_addMethod(traitImpl_Finalizable_Point, BuiltIn.traits.Finalizable.methods.finalize, Point_MethodImpl_Finalizable_finalize);
 
-	TraitImpl* traitImpl_Constructable_Point = TraitImpl_create(BuiltIn.traits.Constructable.trait, type_Point);
+	TraitImpl* traitImpl_Constructable_Point = TraitImpl_create(BuiltIn.traits.Constructable.trait, clsPoint);
 	TraitImpl_addMethod(traitImpl_Constructable_Point, BuiltIn.traits.Constructable.methods.construct, Point_MethodImpl_Constructable_construct);
 }
 
@@ -59,7 +61,7 @@ void Point_initType(void) {
 
 void* Point_MethodImpl_Describe_toString(MethodContext* CTX) {
 	const DataPoint* this =	TR_METHOD_UNWRAP_START();
-	TR_CHECK_ALL(type_Point, Describe.trait, Describe.methods.toString);
+	TR_CHECK_ALL(clsPoint, trDescribe.trait, trDescribe.methods.toString);
 	TR_METHOD_UNWRAP_END();
 
 	const int len = snprintf(NULL, 0, "%s(x=%d, y=%d)", Type_getById(CTX->object->type_id)->name.str, this->x, this->y);
@@ -74,7 +76,7 @@ void* Point_MethodImpl_Describe_toString(MethodContext* CTX) {
 
 void* Point_MethodImpl_Move2i_move(MethodContext* CTX) {
 	DataPoint* this = TR_METHOD_UNWRAP_START();
-	TR_CHECK_ALL(type_Point, Move2i.trait, Move2i.methods.move);
+	TR_CHECK_ALL(clsPoint, trMove2i.trait, trMove2i.methods.move);
 	const int deltaX = ARG_UNWRAP(int);
 	const int deltaY = ARG_UNWRAP(int);
 	TR_METHOD_UNWRAP_END();
