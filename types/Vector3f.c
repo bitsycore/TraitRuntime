@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 #include "../common/ErrorHandling.h"
-#include "../traits/Format.h"
+#include "../traits/Describe.h"
 #include "../traits/Move3f.h"
 
 Type* type_Vector3f;
@@ -14,20 +14,22 @@ Type* type_Vector3f;
 // ===========================================================
 
 void Vector3f_initType() {
-	type_Vector3f = TYPE("Vector3f", DataVector3f);
-	TraitImpl* traitImpl_Format_Vector3f = TraitImpl_create(trait_Format, type_Vector3f);
-	TraitImpl_addMethod(traitImpl_Format_Vector3f, method_Format_toString, MethodImpl_Vector3f_Format_toString);
+	type_Vector3f = TR_TYPE("Vector3f", Data_Vector3f);
+	TraitImpl* traitImpl_Describe_Vector3f = TraitImpl_create(Describe.trait, type_Vector3f);
+	TraitImpl_addMethod(traitImpl_Describe_Vector3f, Describe.methods.toString, MethodImpl_Vector3f_Describe_toString);
 
-	TraitImpl* traitImpl_Move3f_Vector3f = TraitImpl_create(trait_Move3f, type_Vector3f);
-	TraitImpl_addMethod(traitImpl_Move3f_Vector3f, method_Move3f_move, MethodImpl_Move3f_Vector3f_move);
-	TraitImpl_addMethod(traitImpl_Move3f_Vector3f, method_Move3f_moveX, MethodImpl_Move3f_Vector3f_moveX);
-	TraitImpl_addMethod(traitImpl_Move3f_Vector3f, method_Move3f_moveY, MethodImpl_Move3f_Vector3f_moveY);
-	TraitImpl_addMethod(traitImpl_Move3f_Vector3f, method_Move3f_moveZ, MethodImpl_Move3f_Vector3f_moveZ);
+	TR_USE(TraitImpl, TraitImpl_create(Move3f.trait, type_Vector3f)) {
+		TraitImpl_addMethod(it, Move3f.methods.move, MethodImpl_Move3f_Vector3f_move);
+		TraitImpl_addMethod(it, Move3f.methods.moveX, MethodImpl_Move3f_Vector3f_moveX);
+		TraitImpl_addMethod(it, Move3f.methods.moveY, MethodImpl_Move3f_Vector3f_moveY);
+		TraitImpl_addMethod(it, Move3f.methods.moveZ, MethodImpl_Move3f_Vector3f_moveZ);
+	}
+
 }
 
-void* MethodImpl_Vector3f_Format_toString(MethodContext* CTX) {
-	const DataVector3f* this = METHOD_UNWRAP_START();
-	CHECK_ALL_STR("Vector3f", "Format", "toString");
+void* MethodImpl_Vector3f_Describe_toString(MethodContext* CTX) {
+	const Data_Vector3f* this = METHOD_UNWRAP_START();
+	CHECK_ALL_STR("Vector3f", "Describe", "toString");
 	METHOD_UNWRAP_END();
 	const char* template = "%s(x=%f, y=%f, z=%f)";
 	const Type* type = Object_getType(CTX->object);
@@ -38,7 +40,7 @@ void* MethodImpl_Vector3f_Format_toString(MethodContext* CTX) {
 }
 
 void* MethodImpl_Move3f_Vector3f_move(MethodContext* CTX) {
-	DataVector3f* this = METHOD_UNWRAP_START();
+	Data_Vector3f* this = METHOD_UNWRAP_START();
 	CHECK_ALL_STR("Vector3f", "Move3f", "move");
 	const float deltaX = ARG_UNWRAP(double);
 	const float deltaY = ARG_UNWRAP(double);
@@ -53,7 +55,7 @@ void* MethodImpl_Move3f_Vector3f_move(MethodContext* CTX) {
 }
 
 void* MethodImpl_Move3f_Vector3f_moveX(MethodContext* CTX) {
-	DataVector3f* this = METHOD_UNWRAP_START();
+	Data_Vector3f* this = METHOD_UNWRAP_START();
 	CHECK_ALL_STR("Vector3f", "Move3f", "moveX");
 	const float deltaX = ARG_UNWRAP(double);
 	METHOD_UNWRAP_END();
@@ -64,7 +66,7 @@ void* MethodImpl_Move3f_Vector3f_moveX(MethodContext* CTX) {
 }
 
 void* MethodImpl_Move3f_Vector3f_moveY(MethodContext* CTX) {
-	DataVector3f* this = METHOD_UNWRAP_START();
+	Data_Vector3f* this = METHOD_UNWRAP_START();
 	CHECK_ALL_STR("Vector3f", "Move3f", "moveY");
 	const float deltaY = ARG_UNWRAP(double);
 	METHOD_UNWRAP_END();
@@ -75,7 +77,7 @@ void* MethodImpl_Move3f_Vector3f_moveY(MethodContext* CTX) {
 }
 
 void* MethodImpl_Move3f_Vector3f_moveZ(MethodContext* CTX) {
-	DataVector3f* this = METHOD_UNWRAP_START();
+	Data_Vector3f* this = METHOD_UNWRAP_START();
 	CHECK_ALL_STR("Vector3f", "Move3f", "moveZ");
 	const float deltaZ = ARG_UNWRAP(double);
 	METHOD_UNWRAP_END();

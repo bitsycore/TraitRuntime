@@ -13,8 +13,8 @@ add_executable(TraitRuntime
         types/Point.h
         types/Vector3f.c
         types/Vector3f.h
-        traits/Format.c
-        traits/Format.h
+        traits/Describe.c
+        traits/Describe.h
         traits/Move2i.c
         traits/Move2i.h
         traits/Move3f.c

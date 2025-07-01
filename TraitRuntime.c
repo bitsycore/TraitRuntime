@@ -9,7 +9,7 @@
 // BUILT IN TYPE
 // =====================================
 
-BuiltInStore BuiltIn;
+Container_BuiltIn BuiltIn;
 
 // =====================================
 // GENERAL
@@ -42,22 +42,22 @@ void TraitRuntime_init(const bool enable_builtin) {
 	// ==============================================
 	// LOAD ALL BUILT IN TYPES AND TRAIT
 
-	BuiltIn.traits.Finalizable.trait = TRAIT("Finalizable");
-	BuiltIn.traits.Finalizable.methods.finalize = Trait_addMethod(BuiltIn.traits.Finalizable.trait, HASH_STR("finalize"), DEF_PARAM());
+	BuiltIn.traits.Finalizable.trait = TR_TRAIT("Finalizable");
+	BuiltIn.traits.Finalizable.methods.finalize = Trait_addMethod(BuiltIn.traits.Finalizable.trait, HASH_STR("finalize"), TR_PARAMS());
 
-	BuiltIn.traits.Constructable.trait = TRAIT("Constructable");
-	BuiltIn.traits.Constructable.methods.construct = Trait_addMethod(BuiltIn.traits.Constructable.trait, HASH_STR("construct"), DEF_PARAM());
+	BuiltIn.traits.Constructable.trait = TR_TRAIT("Constructable");
+	BuiltIn.traits.Constructable.methods.construct = Trait_addMethod(BuiltIn.traits.Constructable.trait, HASH_STR("construct"), TR_PARAMS());
 
-	BuiltIn.types.UInt8 = TYPE("UInt8", uint8_t);
-	BuiltIn.types.UInt16 = TYPE("UInt16", uint16_t);
-	BuiltIn.types.UInt32 = TYPE("UInt32", uint32_t);
-	BuiltIn.types.UInt64 = TYPE("UInt64", uint64_t);
-	BuiltIn.types.Int8 = TYPE("Int8", int8_t);
-	BuiltIn.types.Int16 = TYPE("Int16", int16_t);
-	BuiltIn.types.Int32 = TYPE("Int32", int32_t);
-	BuiltIn.types.Int64 = TYPE("Int64", int64_t);
-	BuiltIn.types.Float32 = TYPE("Float32", float);
-	BuiltIn.types.Float64 = TYPE("Float64", double);
+	BuiltIn.types.UInt8 = TR_TYPE("UInt8", uint8_t);
+	BuiltIn.types.UInt16 = TR_TYPE("UInt16", uint16_t);
+	BuiltIn.types.UInt32 = TR_TYPE("UInt32", uint32_t);
+	BuiltIn.types.UInt64 = TR_TYPE("UInt64", uint64_t);
+	BuiltIn.types.Int8 = TR_TYPE("Int8", int8_t);
+	BuiltIn.types.Int16 = TR_TYPE("Int16", int16_t);
+	BuiltIn.types.Int32 = TR_TYPE("Int32", int32_t);
+	BuiltIn.types.Int64 = TR_TYPE("Int64", int64_t);
+	BuiltIn.types.Float32 = TR_TYPE("Float32", float);
+	BuiltIn.types.Float64 = TR_TYPE("Float64", double);
 }
 
 void TraitRuntime_clean() {

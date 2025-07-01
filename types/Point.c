@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 #include "../common/Log.h"
-#include "../traits/Format.h"
+#include "../traits/Describe.h"
 #include "../traits/Move2i.h"
 
 Type* type_Point;
@@ -36,14 +36,15 @@ void* Point_MethodImpl_Constructable_construct(MethodContext* CTX) {
 // ===========================================================
 
 void Point_initType(void) {
-	type_Point = TYPE("Point", DataPoint);
-	TraitImpl* traitImpl_Format_Point = TraitImpl_create(trait_Format, type_Point);
-	TraitImpl_addMethod(traitImpl_Format_Point, method_Format_toString, Point_MethodImpl_Format_toString);
+	type_Point = TR_TYPE("Point", DataPoint);
+	TraitImpl* traitImpl_Describe_Point = TraitImpl_create(Describe.trait, type_Point);
+	TraitImpl_addMethod(traitImpl_Describe_Point, Describe.methods.toString, Point_MethodImpl_Describe_toString);
 
-	TraitImpl* traitImpl_Move2i_Point = TraitImpl_create(trait_Move2i, type_Point);
-	TRAIT_IMPL_METHOD(traitImpl_Move2i_Point, "move", Point_MethodImpl_Move2i_move);
-	TRAIT_IMPL_METHOD(traitImpl_Move2i_Point, "moveX", Point_MethodImpl_Move2i_moveX);
-	TRAIT_IMPL_METHOD(traitImpl_Move2i_Point, "moveY", Point_MethodImpl_Move2i_moveY);
+	TR_USE(TraitImpl, TraitImpl_create(Move2i.trait, type_Point)) {
+		TRAIT_IMPL_METHOD(it, "move", Point_MethodImpl_Move2i_move);
+		TRAIT_IMPL_METHOD(it, "moveX", Point_MethodImpl_Move2i_moveX);
+		TRAIT_IMPL_METHOD(it, "moveY", Point_MethodImpl_Move2i_moveY);
+	}
 
 	TraitImpl* traitImpl_Finalizable_Point = TraitImpl_create(BuiltIn.traits.Finalizable.trait, type_Point);
 	TraitImpl_addMethod(traitImpl_Finalizable_Point, BuiltIn.traits.Finalizable.methods.finalize, Point_MethodImpl_Finalizable_finalize);
@@ -53,12 +54,12 @@ void Point_initType(void) {
 }
 
 // ===========================================================
-// Impl Format
+// Impl Describe
 // ===========================================================
 
-void* Point_MethodImpl_Format_toString(MethodContext* CTX) {
+void* Point_MethodImpl_Describe_toString(MethodContext* CTX) {
 	const DataPoint* this =	METHOD_UNWRAP_START();
-	CHECK_ALL(type_Point, trait_Format, method_Format_toString);
+	CHECK_ALL(type_Point, Describe.trait, Describe.methods.toString);
 	METHOD_UNWRAP_END();
 
 	const int len = snprintf(NULL, 0, "%s(x=%d, y=%d)", Type_getById(CTX->object->type_id)->name.str, this->x, this->y);
@@ -73,7 +74,7 @@ void* Point_MethodImpl_Format_toString(MethodContext* CTX) {
 
 void* Point_MethodImpl_Move2i_move(MethodContext* CTX) {
 	DataPoint* this = METHOD_UNWRAP_START();
-	CHECK_ALL(type_Point, trait_Move2i, method_Move2i_move);
+	CHECK_ALL(type_Point, Move2i.trait, Move2i.methods.move);
 	const int deltaX = ARG_UNWRAP(int);
 	const int deltaY = ARG_UNWRAP(int);
 	METHOD_UNWRAP_END();

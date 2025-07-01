@@ -140,27 +140,27 @@ typedef struct {
 			} methods;
 		} Constructable;
 	} traits;
-} BuiltInStore;
+} Container_BuiltIn;
 
-extern BuiltInStore BuiltIn;
+extern Container_BuiltIn BuiltIn;
 
 // =========================================
 // SUGAR
 // =========================================
 
-#define TRAIT_RUNTIME_INIT() TraitRuntime_init(ENABLE_BUILTIN)
+#define TR_INIT() TraitRuntime_init(ENABLE_BUILTIN)
 
-#define TYPE(name, data) \
+#define TR_TYPE(name, data) \
 	Type_create(HASH_STR(name), sizeof(data))
 
 #define _______TR_TRAIT_1(name, ...) Trait_create(HASH_STR(name), 0)
 #define _______TR_TRAIT_2(name, type) Trait_create(HASH_STR(name), sizeof(type))
-#define TRAIT(name, ...) MU_GET_MACRO_2(_, ##__VA_ARGS__, _______TR_TRAIT_2, _______TR_TRAIT_1)(name, __VA_ARGS__)
+#define TR_TRAIT(name, ...) MU_GET_MACRO_2(_, ##__VA_ARGS__, _______TR_TRAIT_2, _______TR_TRAIT_1)(name, __VA_ARGS__)
 
-#define DEF_PARAM(...) MU_COUNT_ARGS(__VA_ARGS__) == 0 ? NULL : (HashStr[]){ MU_MAP(HASH_STR, __VA_ARGS__) }, MU_COUNT_ARGS(__VA_ARGS__)
-#define PARAM_VA_MARK "__*_VAMARK_*__"
-#define TRAIT_ADD_METHOD(trait, method_name, ...) Trait_addMethod(trait, HASH_STR(method_name), DEF_PARAM(__VA_ARGS__))
-#define TRAIT_GET(trait_name) Trait_get(HASH_STR(trait_name))
+#define TR_TRAIT_ADD_METHOD(trait, method_name, ...) Trait_addMethod(trait, HASH_STR(method_name), TR_PARAMS(__VA_ARGS__))
+#define TR_PARAMS(...) MU_COUNT_ARGS(__VA_ARGS__) == 0 ? NULL : (HashStr[]){ __VA_OPT__(MU_MAP(HASH_STR, __VA_ARGS__)) } , MU_COUNT_ARGS(__VA_ARGS__)
+#define TR_PARAM_VA "__*_VAMARK_*__"
+
 
 #define TRAIT_IMPL(traitName, typeName) \
 	TraitImpl_create(Trait_get(HASH_STR(traitName)), Type_get(HASH_STR(typeName)))

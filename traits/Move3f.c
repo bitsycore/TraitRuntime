@@ -1,15 +1,13 @@
 #include "Move3f.h"
 
-Trait* trait_Move3f;
-Method* method_Move3f_move;
-Method* method_Move3f_moveX;
-Method* method_Move3f_moveY;
-Method* method_Move3f_moveZ;
+Container_Move3f Move3f;
 
 void Move3f_loadTrait() {
-	trait_Move3f = TRAIT("Move3f");
-	method_Move3f_move = TRAIT_ADD_METHOD(trait_Move3f, "move", "x", "y", "z");
-	method_Move3f_moveX = TRAIT_ADD_METHOD(trait_Move3f, "moveX", "y");
-	method_Move3f_moveY = TRAIT_ADD_METHOD(trait_Move3f, "moveY", "y");
-	method_Move3f_moveZ = TRAIT_ADD_METHOD(trait_Move3f, "moveZ", "z");
+	Move3f.trait = TR_TRAIT("Move3f");
+	TR_USE(Trait, Move3f.trait) {
+		Move3f.methods.move  = TR_TRAIT_ADD_METHOD(it, "move", "x", "y", "z");
+		Move3f.methods.moveX = TR_TRAIT_ADD_METHOD(it, "moveX", "y");
+		Move3f.methods.moveY = TR_TRAIT_ADD_METHOD(it, "moveY", "y");
+		Move3f.methods.moveZ = TR_TRAIT_ADD_METHOD(it, "moveZ", "z");
+	}
 }

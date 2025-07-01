@@ -5,18 +5,18 @@
 
 #include "common/Log.h"
 #include "TraitRuntime.h"
-#include "traits/Format.h"
+#include "traits/Describe.h"
 #include "traits/Move2i.h"
 #include "traits/Move3f.h"
 #include "types/Point.h"
 #include "types/Vector3f.h"
 
 // ===========================================================
-// Using Any Format
+// Using Any Describe
 // ===========================================================
 
-void Format_print(const Object* this) {
-	const char* objToString = CALL_EX(this, "Format", "toString");
+void Describe_print(const Object* this) {
+	const char* objToString = Object_call(this, Describe.methods.toString);
 	LOG("toString: %s\n", objToString);
 	free((void*)objToString);
 	objToString = NULL;
@@ -26,9 +26,9 @@ void Format_print(const Object* this) {
 // UINT64
 // ===========================================================
 
-void* MethodImpl_Format_UInt64_toString(MethodContext* CTX) {
+void* MethodImpl_Describe_UInt64_toString(MethodContext* CTX) {
 	const uint64_t this = *(uint64_t*) METHOD_UNWRAP_START();
-	CHECK_ALL_STR("UInt64", "Format", "toString");
+	CHECK_ALL_STR("UInt64", "Describe", "toString");
 	METHOD_UNWRAP_END();
 	const char* template = "%s(%llu)";
 	const int len = snprintf(NULL, 0, template, Type_getById(CTX->object->type_id)->name.str, this);
@@ -41,9 +41,9 @@ void printObjInfo(const Object* instance_point) {
 	const Type* type = Object_getType(instance_point);
 	LOG("Object is of type: %s\n", type->name.str);
 	LOG("Object data size: %zu\n", type->size);
-	LOG("Point implement Format = %d\n", Type_implement(type, trait_Format));
-	LOG("Point implement Move2i = %d\n", Type_implement(type, trait_Move2i));
-	LOG("Point implement Move3f = %d\n", Type_implement(type, trait_Move3f));
+	LOG("Point implement Describe = %d\n", Type_implement(type, Describe.trait));
+	LOG("Point implement Move2i = %d\n", Type_implement(type, Move2i.trait));
+	LOG("Point implement Move3f = %d\n", Type_implement(type, Move3f.trait));
 }
 
 void do_work(void) {
@@ -65,12 +65,12 @@ void do_work(void) {
 	// Test Call
 	LINE_BREAK();
 
-	Format_print(instance_point);
+	Describe_print(instance_point);
 	CALL_EX(instance_point, "Move2i", "move", 3, 2);
 	CALL_EX(instance_point, "Move2i", "moveX", -12);
 	CALL_EX(instance_point, "Move2i", "moveY", 33);
 	CALL_EX(instance_point, "Move2i", "moveY", 123);
-	Format_print(instance_point);
+	Describe_print(instance_point);
 	CALL(instance_point, "move", 3, 2);
 	CALL(instance_point, "moveX", -12);
 	CALL(instance_point, "moveY", 33);
@@ -78,12 +78,12 @@ void do_work(void) {
 
 	LINE_BREAK();
 
-	Format_print(instance_vector3f);
-	Object_call(instance_vector3f, method_Move3f_move, 1.0f, 2.0f, 3.0f);
-	Object_call(instance_vector3f, method_Move3f_moveY, -12.0f);
-	Object_call(instance_vector3f, method_Move3f_moveZ, 33.0f);
-	Object_call(instance_vector3f, method_Move3f_moveX, -66.0f);
-	Format_print(instance_vector3f);
+	Describe_print(instance_vector3f);
+	Object_call(instance_vector3f, Move3f.methods.move, 1.0f, 2.0f, 3.0f);
+	Object_call(instance_vector3f, Move3f.methods.moveY, -12.0f);
+	Object_call(instance_vector3f, Move3f.methods.moveZ, 33.0f);
+	Object_call(instance_vector3f, Move3f.methods.moveX, -66.0f);
+	Describe_print(instance_vector3f);
 
 	LINE_BREAK();
 
@@ -99,11 +99,11 @@ int main() {
 
 	// =====================================================================
 	// Init Runtime
-	TRAIT_RUNTIME_INIT();
+	TR_INIT();
 
 	// =====================================================================
 	// Create Traits
-	Format_loadTrait();
+	Describe_loadTrait();
 	Move2i_loadTrait();
 	Move3f_loadTrait();
 
@@ -114,8 +114,8 @@ int main() {
 
 	// =====================================================================
 	// Impl Traits for Uint64
-	TraitImpl* traitImpl_Format_UInt64 = TraitImpl_create(trait_Format, BuiltIn.types.UInt64);
-	TraitImpl_addMethod(traitImpl_Format_UInt64, method_Format_toString, MethodImpl_Format_UInt64_toString);
+	TraitImpl* traitImpl_Describe_UInt64 = TraitImpl_create(Describe.trait, BuiltIn.types.UInt64);
+	TraitImpl_addMethod(traitImpl_Describe_UInt64, Describe.methods.toString, MethodImpl_Describe_UInt64_toString);
 
 	const clock_t end = clock();
 	const double time_spent = (double)(end - start) / CLOCKS_PER_SEC;

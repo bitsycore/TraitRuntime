@@ -1,13 +1,12 @@
 #include "Move2i.h"
 
-Trait* trait_Move2i;
-Method* method_Move2i_move;
-Method* method_Move2i_moveX;
-Method* method_Move2i_moveY;
+Container_Move2i Move2i;
 
 void Move2i_loadTrait() {
-	trait_Move2i = TRAIT("Move2i");
-	method_Move2i_move = Trait_addMethod(trait_Move2i, HASH_STR("move"), DEF_PARAM("x", "y"));
-	method_Move2i_moveX = Trait_addMethod(trait_Move2i, HASH_STR("moveX"), DEF_PARAM("x"));
-	method_Move2i_moveY = Trait_addMethod(trait_Move2i, HASH_STR("moveY"), DEF_PARAM("y"));
+	Move2i.trait = TR_TRAIT("Move2i");
+	TR_USE(Trait, Move2i.trait) {
+		Move2i.methods.move = Trait_addMethod(it, HASH_STR("move"), TR_PARAMS("x", "y"));
+		Move2i.methods.moveX = Trait_addMethod(it, HASH_STR("moveX"), TR_PARAMS("x"));
+		Move2i.methods.moveY = Trait_addMethod(it, HASH_STR("moveY"), TR_PARAMS("y"));
+	}
 }

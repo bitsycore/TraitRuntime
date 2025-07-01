@@ -4,14 +4,16 @@
 #include "../TraitRuntime.h"
 
 typedef struct {
-	float x, y, z;
-} Move3fData;
+	Trait* trait;
+	struct {
+		Method* move;
+		Method* moveX;
+		Method* moveY;
+		Method* moveZ;
+	} methods;
+} Container_Move3f;
 
-extern Trait* trait_Move3f;
-extern Method* method_Move3f_move;
-extern Method* method_Move3f_moveX;
-extern Method* method_Move3f_moveZ;
-extern Method* method_Move3f_moveY;
+extern Container_Move3f Move3f;
 
 void Move3f_loadTrait();
 

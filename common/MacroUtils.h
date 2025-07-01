@@ -126,7 +126,7 @@ _31,_32,_33,_34,_35,_36,_37,_38,_39,_40,N,\
 #define _______MU_MAP39(m,x1,...) m(x1), _______MU_MAP38(m,__VA_ARGS__)
 #define _______MU_MAP40(m,x1,...) m(x1), _______MU_MAP39(m,__VA_ARGS__)
 
-#define MU_MAP(m, ...) MU_GET_MACRO_41(__VA_ARGS__, \
+#define MU_MAP(m, ...) MU_GET_MACRO_40(__VA_ARGS__, \
 _______MU_MAP40, _______MU_MAP39, _______MU_MAP38, _______MU_MAP37, _______MU_MAP36, \
 _______MU_MAP35, _______MU_MAP34, _______MU_MAP33, _______MU_MAP32, _______MU_MAP31, \
 _______MU_MAP30, _______MU_MAP29, _______MU_MAP28, _______MU_MAP27, _______MU_MAP26, \
@@ -134,8 +134,7 @@ _______MU_MAP25, _______MU_MAP24, _______MU_MAP23, _______MU_MAP22, _______MU_MA
 _______MU_MAP20, _______MU_MAP19, _______MU_MAP18, _______MU_MAP17, _______MU_MAP16, \
 _______MU_MAP15, _______MU_MAP14, _______MU_MAP13, _______MU_MAP12, _______MU_MAP11, \
 _______MU_MAP10, _______MU_MAP9,  _______MU_MAP8,  _______MU_MAP7,  _______MU_MAP6,  \
-_______MU_MAP5,  _______MU_MAP4,  _______MU_MAP3,  _______MU_MAP2,  _______MU_MAP1,  \
-_______MU_MAP0 \
+_______MU_MAP5,  _______MU_MAP4,  _______MU_MAP3,  _______MU_MAP2,  _______MU_MAP1  \
 )(m, __VA_ARGS__)
 
 #endif //MACROUTILS_H

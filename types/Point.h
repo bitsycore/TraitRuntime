@@ -11,7 +11,7 @@ typedef struct {
 
 void Point_initType(void);
 
-void* Point_MethodImpl_Format_toString(MethodContext* CTX);
+void* Point_MethodImpl_Describe_toString(MethodContext* CTX);
 
 void* Point_MethodImpl_Finalizable_finalize(MethodContext* CTX);
 

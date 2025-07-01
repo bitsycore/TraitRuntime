@@ -3,10 +3,16 @@
 
 #include "../TraitRuntime.h"
 
-extern Trait* trait_Move2i;
-extern Method* method_Move2i_move;
-extern Method* method_Move2i_moveX;
-extern Method* method_Move2i_moveY;
+typedef struct {
+    Trait* trait;
+    struct {
+        Method* move;
+        Method* moveX;
+        Method* moveY;
+    } methods;
+} Container_Move2i;
+
+extern Container_Move2i Move2i;
 
 void Move2i_loadTrait();
 
