@@ -6,15 +6,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "TraitRuntime/String/HashStr.h"
-#include "TraitRuntime/Commons/MacroUtils.h"
 #include "TraitRuntime/Commons/ErrorHandling.h"
+#include "TraitRuntime/Commons/MacroUtils.h"
+#include "TraitRuntime/String/HashStr.h"
 
 #define ENABLE_BUILTIN true
 
 #define MAX_TRAITS 32
 #define MAX_CLASSES 32
-#define MAX_TRAIT_IMPLS ((MAX_CLASSES * MAX_TRAITS / 2))
+#define MAX_TRAIT_IMPLS ((MAX_TRAITS / 2))
 
 #define MAX_METHODS_PER_TRAITS 8
 #define MAX_PARAMS_PER_METHODS 8
@@ -25,12 +25,6 @@ struct Trait;
 struct TraitImpl;
 struct Method;
 struct MethodContext;
-
-typedef struct Class {
-	HashStr name;
-	size_t id;
-	size_t size;
-} Class;
 
 typedef struct Object {
 	size_t type_id;
@@ -62,52 +56,23 @@ typedef struct MethodContext {
 typedef void* (*MethodImpl)(MethodContext* CTX);
 
 typedef struct TraitImpl {
-	size_t type_id;
+	size_t class_id;
 	Trait* trait;
 	MethodImpl methods[MAX_METHODS_PER_TRAITS];
 } TraitImpl;
+
+typedef struct Class {
+	HashStr name;
+	size_t id;
+	size_t size;
+	size_t trait_impl_count;
+	TraitImpl traits_impl[MAX_TRAIT_IMPLS];
+} Class;
 
 // ===================================
 // General
 void TraitRuntime_init(bool enable_builtin);
 void TraitRuntime_clean();
-
-// ===================================
-// Class
-Class* Class_create(HashStr name, size_t size);
-Class* Class_get(HashStr name);
-Class* Class_getById(size_t id);
-bool Class_implement(const Class* type, const Trait* trait);
-bool Class_implementById(size_t id, const Trait* trait);
-bool Class_equal(const Class* this, const Class* other);
-
-// ===================================
-// Trait
-Trait* Trait_create(HashStr name, size_t data_size);
-Trait* Trait_get(HashStr name);
-Method* Trait_addMethod(Trait* trait, HashStr method_name, const HashStr* param_types, size_t param_count);
-Method* Trait_getMethod(const Trait* trait, HashStr method_name);
-bool Trait_equal(const Trait* this, const Trait* other);
-
-// ===================================
-// TraitImpl
-TraitImpl* TraitImpl_create(Trait* trait, Class* type);
-void TraitImpl_addMethod(TraitImpl* trait_impl, const Method* method, MethodImpl method_impl);
-TraitImpl* TraitImpl_get(size_t type_id, const Trait* trait);
-MethodImpl TraitImpl_getMethodImpl(const TraitImpl* trait_impl, HashStr method_name);
-
-// ===================================
-// Object
-Object* Object_new(const Class* type);
-Object* Object_newFrom(const Class* type, void* data);
-MethodImpl Object_getMethod(const Object* obj, HashStr trait_name, HashStr method_name);
-bool Object_is(const Object* obj, const Class* type);
-bool Object_implement(const Object* obj, const Trait* trait);
-void Object_destroy(Object* obj);
-void* Object_call(const Object* obj, const Method* method, ...);
-void* Object_callStrEx(const Object* obj, HashStr trait_name, HashStr method_name, ... );
-void* Object_callStr(const Object* obj, HashStr method_name, ... );
-Class* Object_getClass(const Object* obj);
 
 // ======================================================================================
 // BUILT IN TYPE
@@ -125,7 +90,7 @@ typedef struct {
 		Class* Int64;
 		Class* Float32;
 		Class* Float64;
-	} types;
+	} classes;
 	struct {
 		struct {
 			Trait* trait;
@@ -158,7 +123,6 @@ extern Container_BuiltIn BuiltIn;
 #define TR_TRAIT_ADD_METHOD(trait, method_name, ...) Trait_addMethod(trait, HASH_STR(method_name), TR_PARAMS(__VA_ARGS__))
 #define TR_PARAMS(...) MU_COUNT_ARGS(__VA_ARGS__) == 0 ? NULL : (HashStr[]){ __VA_OPT__(MU_MAP(HASH_STR, __VA_ARGS__)) } , MU_COUNT_ARGS(__VA_ARGS__)
 #define TR_PARAM_VA "__*_VAMARK_*__"
-
 
 #define TR_TRAIT_IMPL(traitName, typeName) TraitImpl_create(Trait_get(HASH_STR(traitName)), Class_get(HASH_STR(typeName)))
 #define TR_TRAIT_IMPL_METHOD(traitImpl, methodName, fn) TraitImpl_addMethod(traitImpl, Trait_getMethod(traitImpl->trait, HASH_STR(methodName)), fn)

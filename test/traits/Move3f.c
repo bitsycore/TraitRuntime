@@ -1,5 +1,7 @@
 #include "Move3f.h"
 
+#include "TraitRuntime/Trait.h"
+
 Container_Move3f trMove3f;
 
 void Move3f_loadTrait() {

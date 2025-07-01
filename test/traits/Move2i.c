@@ -1,5 +1,7 @@
 #include "Move2i.h"
 
+#include "TraitRuntime/Trait.h"
+
 Container_Move2i trMove2i;
 
 void Move2i_loadTrait() {

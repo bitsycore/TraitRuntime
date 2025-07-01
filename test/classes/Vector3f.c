@@ -6,6 +6,9 @@
 #include <TraitRuntime/Commons/ErrorHandling.h>
 #include "../traits/Describe.h"
 #include "../traits/Move3f.h"
+#include "TraitRuntime/Class.h"
+#include "TraitRuntime/Object.h"
+#include "TraitRuntime/Trait.h"
 
 Class* clsVector3f;
 

@@ -14,14 +14,17 @@ add_library(trait_runtime
         src/TraitRuntime/Commons/Log.h
         src/TraitRuntime/Commons/Log.c
         src/TraitRuntime/Commons/MacroUtils.h
-        src/TraitRuntime/Memory/MemPool.c
-        src/TraitRuntime/Memory/MemPool.h
-        src/TraitRuntime/Memory/MaxAlign.h
         src/TraitRuntime/Memory/Arena.c
         src/TraitRuntime/Memory/Arena.h
         src/TraitRuntime/Commons/AlertDialog.c
         src/TraitRuntime/Commons/AlertDialog.h
         src/TraitRuntime/Commons/ErrorHandling.c
+        src/TraitRuntime/Class.c
+        src/TraitRuntime/Class.h
+        src/TraitRuntime/Object.c
+        src/TraitRuntime/Object.h
+        src/TraitRuntime/Trait.c
+        src/TraitRuntime/Trait.h
 )
 
 add_executable(demo

@@ -1,5 +1,7 @@
 #include "Describe.h"
 
+#include "TraitRuntime/Trait.h"
+
 Container_Describe trDescribe;
 
 void Describe_loadTrait() {

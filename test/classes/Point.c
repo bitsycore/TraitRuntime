@@ -8,6 +8,9 @@
 
 #include "../traits/Describe.h"
 #include "../traits/Move2i.h"
+#include "TraitRuntime/Class.h"
+#include "TraitRuntime/Object.h"
+#include "TraitRuntime/Trait.h"
 
 Class* clsPoint;
 

@@ -10,6 +10,9 @@
 #include "traits/Move3f.h"
 #include "classes/Point.h"
 #include "classes/Vector3f.h"
+#include "TraitRuntime/Class.h"
+#include "TraitRuntime/Object.h"
+#include "TraitRuntime/Trait.h"
 
 // ===========================================================
 // Using Any Describe
@@ -57,7 +60,7 @@ void do_work(void) {
 
 	LINE_BREAK();
 
-	Object* instance_uint64 = Object_new(BuiltIn.types.UInt64);
+	Object* instance_uint64 = Object_new(BuiltIn.classes.UInt64);
 	*(uint64_t*)instance_uint64->data = 512;
 	printObjInfo(instance_uint64);
 
@@ -114,7 +117,7 @@ int main() {
 
 	// =====================================================================
 	// Impl Traits for Uint64
-	TraitImpl* traitImpl_Describe_UInt64 = TraitImpl_create(trDescribe.trait, BuiltIn.types.UInt64);
+	TraitImpl* traitImpl_Describe_UInt64 = TraitImpl_create(trDescribe.trait, BuiltIn.classes.UInt64);
 	TraitImpl_addMethod(traitImpl_Describe_UInt64, trDescribe.methods.toString, MethodImpl_Describe_UInt64_toString);
 
 	const clock_t end = clock();
