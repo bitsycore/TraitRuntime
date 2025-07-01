@@ -35,13 +35,10 @@ static size_t POOL_TRAIT_IMPL_COUNT = 0;
 // =====================================
 
 static void INTERNAL_initialize_built_in_traits_and_types(void) {
-	TR_REPEAT(50) {
-		const size_t arena_size = Arena_requiredSize(it * 64 * 1024 * 1024);
-		Arena* arena = Arena_init(malloc(arena_size), arena_size);
-		void* buffer = Arena_alloc(arena, sizeof(Container_BuiltIn));
-		Arena_reset(arena);
-		free(Arena_buffer(arena));
-	}
+	const size_t arena_size = Arena_requiredSize(64 * 1024 * 1024);
+	Arena* arena = Arena_init(malloc(arena_size), arena_size);
+	uint8_t* buffer = Arena_alloc(arena, 64 * 1024 * 1024);
+	buffer = memset(buffer, 0x88, 64 * 1024 * 1024);
 
 	BuiltIn.traits.Finalizable.trait = TR_TRAIT("Finalizable");
 	BuiltIn.traits.Finalizable.methods.finalize = Trait_addMethod(BuiltIn.traits.Finalizable.trait, HASH_STR("finalize"), TR_PARAMS());
@@ -62,8 +59,8 @@ static void INTERNAL_initialize_built_in_traits_and_types(void) {
 }
 
 void TraitRuntime_init(const bool enable_builtin) {
-	memset(POOL_CLASSES, 0, sizeof(POOL_TRAIT_IMPL));
-	memset(POOL_TRAITS, 0, sizeof(POOL_TRAIT_IMPL));
+	memset(POOL_CLASSES, 0, sizeof(POOL_CLASSES));
+	memset(POOL_TRAITS, 0, sizeof(POOL_TRAITS));
 	memset(POOL_TRAIT_IMPL, 0, sizeof(POOL_TRAIT_IMPL));
 
 	IS_INIT = true;

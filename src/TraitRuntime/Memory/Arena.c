@@ -1,5 +1,7 @@
 #include "Arena.h"
 
+#include "MaxAlign.h"
+
 Arena* Arena_init(void *buffer, size_t size) {
     Arena* arena = (buffer);
     EXIT_IF(

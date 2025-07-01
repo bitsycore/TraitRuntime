@@ -1,35 +1,17 @@
-#include "Debug.h"
+#include "Callstack.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef _WIN32
+// MARK: MSVC DEBUG
+#if defined(_WIN32) && defined(_MSC_VER) && !defined(NDEBUG)
+
 #include <windows.h>
-#endif
-
-void debug_alert(const char *message) {
-	#if defined(_WIN32)
-		MessageBoxA(NULL, message, "Error", MB_OK | MB_ICONERROR);
-	#elif defined(__APPLE__)
-		// TODO obj-c
-	#elif defined(__linux__)
-		//
-	#endif
-}
-
-
-// =====================================================================================================================
-#ifdef _WIN32 // MARK: WINDOWS
-// =====================================================================================================================
-
-// =====================================================================================================================
-#if defined(_MSC_VER) && !defined(NDEBUG)// MARK: Visual Studio DEBUG
-// =====================================================================================================================
 
 #include <dbghelp.h>
 
-char* debug_callstack(const int skip_frames) {
+char* Callstack_AllocStr(const int skip_frames) {
 	void* stack[100];
 	void* process = GetCurrentProcess();
 	SymInitialize(process, NULL, TRUE);
@@ -70,29 +52,23 @@ char* debug_callstack(const int skip_frames) {
 	return buffer;
 }
 
-// =====================================================================================================================
-#else // MARK: MinGW && RELEASE
-// =====================================================================================================================
+// MARK: MINGW && RELEASE
+#elif defined(_WIN32) || defined(NDEBUG)
 
-char* debug_callstack(int skip_frames) {
+char* Callstack_AllocStr(int skip_frames) {
 	const char msg[] = "\n";
 	char* heap_msg = malloc(strlen(msg) + 1);
 	strcpy(heap_msg, msg);
 	return heap_msg;
 }
 
-// =====================================================================================================================
-#endif
-// =====================================================================================================================
-
-// =====================================================================================================================
-#else // MARK: UNIX
-// =====================================================================================================================
+// MARK: UNIX
+#else
 
 #include <execinfo.h>
 #include <unistd.h>
 
-char* debug_callstack() {
+char* Callstack_AllocStr(int skip_frames) {
 	void* stack[100];
 	int frames = backtrace(stack, 100);
 	char** symbols = backtrace_symbols(stack, frames);
@@ -128,10 +104,8 @@ char* debug_callstack() {
 	return buffer;
 }
 
-#ifdef CLEAN_GNU
-#undef __USE_GNU
-#endif
+	#ifdef CLEAN_GNU
+		#undef __USE_GNU
+	#endif
 
-// =====================================================================================================================
 #endif
-// =====================================================================================================================

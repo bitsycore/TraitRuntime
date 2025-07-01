@@ -28,8 +28,8 @@ struct MethodContext;
 
 typedef struct Class {
 	HashStr name;
-	size_t size;
 	size_t id;
+	size_t size;
 } Class;
 
 typedef struct Object {
@@ -172,6 +172,7 @@ extern Container_BuiltIn BuiltIn;
 
 #define TR_METHOD_UNWRAP_START() \
 	CTX->object->data; \
+	CTX = CTX;\
 	unsigned int HIDDEN___count = 0\
 
 #define TR_CHECK_TYPE(_type) \
@@ -191,8 +192,7 @@ extern Container_BuiltIn BuiltIn;
 #define TR_CHECK_ALL_STR(_typeName, _traitName, _methodName) TR_CHECK_TYPE_STR(_typeName); TR_CHECK_TRAIT_STR(_traitName); TR_CHECK_METHOD_STR(_methodName)
 
 #define ARG_UNWRAP(type) \
-	va_arg(CTX->args, type); HIDDEN___count++;\
-	CTX->args = CTX->args/*Disable clang warn on clang mingw cause msvc require it to be not const*/ \
+	va_arg(CTX->args, type); HIDDEN___count++\
 
 #define TR_METHOD_UNWRAP_END() \
 	EXIT_IF(HIDDEN___count != CTX->method->params_count, \
