@@ -7,6 +7,7 @@
 #include <assert.h>
 #include <stdbool.h>
 
+#include "Commons/Flags.h"
 #include "TraitRuntime/BuiltIn.h"
 #include "TraitRuntime/Class.h"
 #include "TraitRuntime/Trait.h"
@@ -24,7 +25,7 @@ Arena* ARENA_GLOBAL;
 // MARK: GENERAL
 // =====================================
 
-static void INTERNAL_initialize_built_in_traits_and_types(void) {
+static void PRIVATE_initialize_built_in_traits_and_types(void) {
 	BuiltIn.traits.Finalizable.trait = Trait_create(HASH_STR("Finalizable"));
 	BuiltIn.traits.Finalizable.methods.finalize =
 		Trait_addMethod(BuiltIn.traits.Finalizable.trait, HASH_STR("finalize"), NULL, 0);
@@ -57,7 +58,7 @@ static void INTERNAL_initialize_built_in_traits_and_types(void) {
 }
 
 void Runtime_init(const bool enable_builtin) {
-	const size_t arena_size = Arena_requiredSize(64*1024*1024);
+	const size_t arena_size = Arena_requiredSize(64*1024);
 	ARENA_GLOBAL = Arena_init(malloc(arena_size), arena_size);
 
 	IS_INIT = true;
@@ -65,10 +66,10 @@ void Runtime_init(const bool enable_builtin) {
 
 	// ==============================================
 	// LOAD ALL BUILT IN TYPES AND TRAIT
-	INTERNAL_initialize_built_in_traits_and_types();
+	PRIVATE_initialize_built_in_traits_and_types();
 }
 
-Arena* Internal_Runtime_getArena() {
+Arena* INTERNAL_Runtime_getArena() {
 	return ARENA_GLOBAL;
 }
 

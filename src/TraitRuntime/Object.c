@@ -7,7 +7,7 @@
 #include "Commons/ErrorHandling.h"
 
 // =====================================
-// MARK: OBJECT
+// MARK: LIFE
 // =====================================
 
 Object* Object_newFrom(Class* clazz, void* data_buffer) {
@@ -26,72 +26,20 @@ Object* Object_new(Class* clazz) {
 	return Object_newFrom(clazz, calloc(1, clazz->data_size));
 }
 
-MethodFunc Object_getMethodStr(const Object* obj, const HashStr trait_name, const HashStr method_name) {
-	EXIT_IF(obj == NULL, "param obj cannot be NULL");
-	const Trait* trait = Trait_get(trait_name);
-	const TraitImpl* impl = TraitImpl_get(obj->class, trait);
-	return TraitImpl_getMethodImplStr(impl, method_name);
+void Object_destroy(Object* obj) {
+	if (obj == NULL) return;
+
+	if (BuiltIn.traits.Finalizable.trait != NULL && Class_implement(obj->class, BuiltIn.traits.Finalizable.trait)) {
+		Object_call(obj, BuiltIn.traits.Finalizable.methods.finalize);
+	}
+
+	free(obj->data);
+	free(obj);
 }
 
-MethodFunc Object_getMethod(const Object* obj, const Method* method) {
-	EXIT_IF(obj == NULL, "param obj cannot be NULL");
-	return TraitImpl_getMethodImplStr(TraitImpl_get(obj->class, method->trait), method->name);
-}
-
-static void* INTERNAL_Object_call(const Object* obj, const Method* trait_method, const TraitImpl* trait_impl, va_list* args) {
-	EXIT_IF(obj == NULL, "param obj cannot be NULL");
-	EXIT_IF(trait_method == NULL, "param trait method cannot be NULL");
-	EXIT_IF(trait_impl == NULL, "param trait impl cannot be NULL");
-
-	const MethodFunc trait_method_impl = TraitImpl_getMethodImplStr(trait_impl, trait_method->name);
-	MethodContext ctx = (MethodContext){obj, trait_method, args};
-
-	return trait_method_impl(&ctx);
-}
-
-void* Object_callStr(const Object* obj, const HashStr method_name, ...) {
-	EXIT_IF(obj == NULL, "param obj cannot be NULL");
-
-	const TraitImpl* trait_impl = TraitImpl_getForMethodStr(Object_getClass(obj), method_name);
-	const Method* method = Trait_getMethod(trait_impl->trait, method_name);
-
-	va_list args;
-	va_start(args, method_name);
-	void* result = INTERNAL_Object_call(obj, method, trait_impl, &args);
-	va_end(args);
-
-	return result;
-}
-
-void* Object_callTraitStr(const Object* obj, const HashStr trait_name, const HashStr method_name, ...) {
-	EXIT_IF(obj == NULL, "param obj cannot be NULL");
-
-	const Trait* trait = Trait_get(trait_name);
-	const TraitImpl* trait_impl = TraitImpl_get(obj->class, trait);
-	const Method* trait_method = Trait_getMethod(trait, method_name);
-
-	va_list args;
-	va_start(args, method_name);
-	void* result = INTERNAL_Object_call(obj, trait_method, trait_impl, &args);
-	va_end(args);
-
-	return result;
-}
-
-void* Object_call(const Object* obj, const Method* method, ...) {
-	EXIT_IF(obj == NULL, "param obj cannot be NULL");
-	EXIT_IF(method == NULL, "param method cannot be NULL");
-
-	const Trait* trait = (Trait*)method->trait;
-	const TraitImpl* trait_impl = TraitImpl_get(obj->class, trait);
-
-	va_list args;
-	va_start(args, method);
-	void* result = INTERNAL_Object_call(obj, method, trait_impl, &args);
-	va_end(args);
-
-	return result;
-}
+// =====================================
+// MARK: GET INFO
+// =====================================
 
 Class* Object_getClass(const Object* obj) {
 	EXIT_IF(obj == NULL, "param obj cannot be NULL");
@@ -108,13 +56,56 @@ bool Object_implement(const Object* obj, const Trait* trait) {
 	return Class_implement(obj->class, trait);
 }
 
-void Object_destroy(Object* obj) {
-	if (obj == NULL) return;
+// =====================================
+// MARK: CALL
+// =====================================
 
-	if (BuiltIn.traits.Finalizable.trait != NULL && Class_implement(obj->class, BuiltIn.traits.Finalizable.trait)) {
-		Object_call(obj, BuiltIn.traits.Finalizable.methods.finalize);
-	}
+static void* PRIVATE_Object_call(const Object* obj, const MethodImpl* method_impl, va_list* args) {
+	EXIT_IF(obj == NULL, "param obj cannot be NULL");
+	EXIT_IF(method_impl == NULL, "param trait impl cannot be NULL");
+	EXIT_IF(args == NULL, "param args cannot be NULL");
 
-	free(obj->data);
-	free(obj);
+	MethodContext ctx = (MethodContext){obj, method_impl->method_def, args};
+
+	return method_impl->method_func(&ctx);
+}
+
+void* Object_callStr(const Object* obj, const HashStr method_name, ...) {
+	EXIT_IF(obj == NULL, "param obj cannot be NULL");
+
+	const MethodImpl* method_impl = Class_getMethodImplStr(obj->class, method_name);
+
+	va_list args;
+	va_start(args, method_name);
+	void* result = PRIVATE_Object_call(obj, method_impl, &args);
+	va_end(args);
+
+	return result;
+}
+
+void* Object_callTraitStr(const Object* obj, const HashStr trait_name, const HashStr method_name, ...) {
+	EXIT_IF(obj == NULL, "param obj cannot be NULL");
+
+	const MethodImpl* trait_impl = Class_getMethodImplStr(obj->class, method_name); // TODO: trait
+
+	va_list args;
+	va_start(args, method_name);
+	void* result = PRIVATE_Object_call(obj, trait_impl, &args);
+	va_end(args);
+
+	return result;
+}
+
+void* Object_call(const Object* obj, const MethodDef* method, ...) {
+	EXIT_IF(obj == NULL, "param obj cannot be NULL");
+	EXIT_IF(method == NULL, "param method cannot be NULL");
+
+	const MethodImpl* method_impl = Class_getMethodImplStr(obj->class, method->name);
+
+	va_list args;
+	va_start(args, method);
+	void* result = PRIVATE_Object_call(obj, method_impl, &args);
+	va_end(args);
+
+	return result;
 }

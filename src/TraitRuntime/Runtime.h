@@ -8,7 +8,7 @@
 // ===================================
 // General
 void Runtime_init(bool enable_builtin);
-Arena* Internal_Runtime_getArena();
+Arena* INTERNAL_Runtime_getArena();
 void Runtime_clean();
 
 #endif //RUNTIMEMANAGER_H

@@ -11,7 +11,7 @@
 // MARK: Internal Helper Function
 // ================================
 
-void eh___handle_error(
+void INTERNAL_ErrorHandling_printError(
     const char *type_str,
     const char *file,
     int line,
@@ -25,29 +25,29 @@ void eh___handle_error(
 // ================================
 
 #define WARN(msg, ...) \
-    eh___handle_error("WARNING", __FILE__, __LINE__, __func__, "Info: "/*glue*/msg, ##__VA_ARGS__)
+    INTERNAL_ErrorHandling_printError("WARNING", __FILE__, __LINE__, __func__, "Info: "/*glue*/msg, ##__VA_ARGS__)
 
 #define WARN_IF(expr, msg, ...) do { \
     if ((expr)) { \
-        eh___handle_error("WARNING", __FILE__, __LINE__, __func__, "Expression: %s\nInfo: "/*glue*/msg, #expr, ##__VA_ARGS__); \
+        INTERNAL_ErrorHandling_printError("WARNING", __FILE__, __LINE__, __func__, "Expression: %s\nInfo: "/*glue*/msg, #expr, ##__VA_ARGS__); \
     } \
 } while (0)
 
 #define WARN_IF_NOT(expr, msg, ...) do { \
     if (!(expr)) { \
-        eh___handle_error("WARNING", __FILE__, __LINE__, __func__, "Expression: !(%s)\nInfo: "/*glue*/msg, #expr, ##__VA_ARGS__); \
+        INTERNAL_ErrorHandling_printError("WARNING", __FILE__, __LINE__, __func__, "Expression: !(%s)\nInfo: "/*glue*/msg, #expr, ##__VA_ARGS__); \
     } \
 } while (0)
 
 #define WARN_IF_EQUAL(expected, actual, msg, ...) do { \
     if ((expected) == (actual)) { \
-        eh___handle_error("WARNING", __FILE__, __LINE__, __func__, "%s\nEQUAL\n%s\nInfo: "/*glue*/msg, #expected, #actual, ##__VA_ARGS__); \
+        INTERNAL_ErrorHandling_printError("WARNING", __FILE__, __LINE__, __func__, "%s\nEQUAL\n%s\nInfo: "/*glue*/msg, #expected, #actual, ##__VA_ARGS__); \
     } \
 } while (0)
 
 #define WARN_IF_NOT_EQUAL(expected, actual, msg, ...) do { \
     if ((expected) != (actual)) { \
-        eh___handle_error("WARNING", __FILE__, __LINE__, __func__, "%s\nNOT EQUAL\n%s\nInfo: "/*glue*/msg, #expected, #actual, ##__VA_ARGS__); \
+        INTERNAL_ErrorHandling_printError("WARNING", __FILE__, __LINE__, __func__, "%s\nNOT EQUAL\n%s\nInfo: "/*glue*/msg, #expected, #actual, ##__VA_ARGS__); \
     } \
 } while (0)
 
@@ -57,32 +57,32 @@ void eh___handle_error(
 // =================================
 
 #define EXIT(msg, ...) \
-    eh___handle_error("ERROR", __FILE__, __LINE__, __func__, "Info: " msg, ##__VA_ARGS__);exit(EXIT_FAILURE)\
+    INTERNAL_ErrorHandling_printError("ERROR", __FILE__, __LINE__, __func__, "Info: " msg, ##__VA_ARGS__);exit(EXIT_FAILURE)\
 
 #define EXIT_IF(expr, msg, ...) do { \
     if ((expr)) { \
-        eh___handle_error("ERROR", __FILE__, __LINE__, __func__, "Expression: %s\nInfo: "/*glue*/msg, #expr, ##__VA_ARGS__); \
+        INTERNAL_ErrorHandling_printError("ERROR", __FILE__, __LINE__, __func__, "Expression: %s\nInfo: "/*glue*/msg, #expr, ##__VA_ARGS__); \
     exit(EXIT_FAILURE);\
     } \
 } while (0)
 
 #define EXIT_IF_NOT(expr, msg, ...) do { \
     if (!(expr)) { \
-        eh___handle_error("ERROR", __FILE__, __LINE__, __func__, "Expression: !(%s)\nInfo: "/*glue*/msg, #expr, ##__VA_ARGS__); \
+        INTERNAL_ErrorHandling_printError("ERROR", __FILE__, __LINE__, __func__, "Expression: !(%s)\nInfo: "/*glue*/msg, #expr, ##__VA_ARGS__); \
         exit(EXIT_FAILURE);\
     } \
 } while (0)
 
 #define EXIT_IF_EQUAL(expected, actual, msg, ...) do { \
     if ((expected) == (actual)) { \
-        eh___handle_error("ERROR", __FILE__, __LINE__, __func__, "%s\nEQUAL\n%s\nInfo: "/*glue*/msg, #expected, #actual, ##__VA_ARGS__); \
+        INTERNAL_ErrorHandling_printError("ERROR", __FILE__, __LINE__, __func__, "%s\nEQUAL\n%s\nInfo: "/*glue*/msg, #expected, #actual, ##__VA_ARGS__); \
         exit(EXIT_FAILURE);\
     } \
 } while (0)
 
 #define EXIT_IF_NOT_EQUAL(expected, actual, msg, ...) do { \
     if ((expected) != (actual)) { \
-        eh___handle_error("ERROR", __FILE__, __LINE__, __func__, "%s\nNOT EQUAL\n%s\nInfo: "/*glue*/msg, #expected, #actual, ##__VA_ARGS__); \
+        INTERNAL_ErrorHandling_printError("ERROR", __FILE__, __LINE__, __func__, "%s\nNOT EQUAL\n%s\nInfo: "/*glue*/msg, #expected, #actual, ##__VA_ARGS__); \
         exit(EXIT_FAILURE);\
     } \
 } while (0)

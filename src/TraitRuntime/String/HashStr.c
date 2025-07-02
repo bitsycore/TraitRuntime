@@ -10,3 +10,9 @@ bool HashStr_equal(const HashStr* a, const HashStr* b) {
   if (a->hash != b->hash) return false;
   return strcmp(a->str, b->str) == 0;
 }
+
+bool HashStr_equalC(const HashStr a, const HashStr b) {
+  if (a.str == NULL || b.str == NULL) return false;
+  if (a.hash != b.hash) return false;
+  return strcmp(a.str, b.str) == 0;
+}

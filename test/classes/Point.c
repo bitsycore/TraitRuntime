@@ -39,20 +39,19 @@ void* Point_MethodImpl_Constructable_construct(MethodContext* CTX) {
 
 void Point_initClass(void) {
 	clsPoint = TR_CLASS("Point", DataPoint);
-	TraitImpl* traitImpl_Describe_Point = TraitImpl_create(trDescribe.trait, clsPoint);
-	TraitImpl_addMethod(traitImpl_Describe_Point, trDescribe.methods.toString, Point_MethodImpl_Describe_toString);
+	Class_implementMethod(clsPoint, trDescribe.methods.toString, Point_MethodImpl_Describe_toString);
+	Class_validateTrait(clsPoint, trDescribe.trait);
 
-	TR_USE(TraitImpl, TraitImpl_create(trMove2i.trait, clsPoint)) {
-		TR_TRAIT_IMPL_METHOD(it, "move", Point_MethodImpl_Move2i_move);
-		TR_TRAIT_IMPL_METHOD(it, "moveX", Point_MethodImpl_Move2i_moveX);
-		TR_TRAIT_IMPL_METHOD(it, "moveY", Point_MethodImpl_Move2i_moveY);
-	}
+	Class_implementMethod(clsPoint, Trait_getMethod(trMove2i.trait, HASH_STR("move")), Point_MethodImpl_Move2i_move);
+	Class_implementMethod(clsPoint, Trait_getMethod(trMove2i.trait, HASH_STR("moveX")), Point_MethodImpl_Move2i_moveX);
+	Class_implementMethod(clsPoint, Trait_getMethod(trMove2i.trait, HASH_STR("moveY")), Point_MethodImpl_Move2i_moveY);
+	Class_validateTrait(clsPoint, trMove2i.trait);
 
-	TraitImpl* traitImpl_Finalizable_Point = TraitImpl_create(BuiltIn.traits.Finalizable.trait, clsPoint);
-	TraitImpl_addMethod(traitImpl_Finalizable_Point, BuiltIn.traits.Finalizable.methods.finalize, Point_MethodImpl_Finalizable_finalize);
+	Class_implementMethod(clsPoint, BuiltIn.traits.Finalizable.methods.finalize, Point_MethodImpl_Finalizable_finalize);
+	Class_validateTrait(clsPoint, BuiltIn.traits.Finalizable.trait);
 
-	TraitImpl* traitImpl_Constructable_Point = TraitImpl_create(BuiltIn.traits.Constructable.trait, clsPoint);
-	TraitImpl_addMethod(traitImpl_Constructable_Point, BuiltIn.traits.Constructable.methods.construct, Point_MethodImpl_Constructable_construct);
+	Class_implementMethod(clsPoint, BuiltIn.traits.Constructable.methods.construct, Point_MethodImpl_Constructable_construct);
+	Class_validateTrait(clsPoint, BuiltIn.traits.Constructable.trait);
 }
 
 // ===========================================================

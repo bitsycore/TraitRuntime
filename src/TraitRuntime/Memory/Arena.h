@@ -14,7 +14,7 @@ typedef struct {
 
 #define Arena_sizeLeft(arena) (arena->capacity - (arena->current - (uintptr_t)arena->buf))
 #define Arena_requiredSize(size) (sizeof(Arena) + (size))
-#define Arena_buffer(_arena) (void*)(_arena->buf - sizeof(Arena))
+#define Arena_initBuffer(_arena) (void*)(_arena->buf - sizeof(Arena))
 #define Arena_reset(_arena) EXIT_IF(_arena == NULL, "_arena is NULL");(_arena->current = _arena->buf)
 
 static inline Arena* Arena_init(void *buffer, const size_t size) {
@@ -36,8 +36,10 @@ static inline void* Arena_alloc(Arena *arena, const size_t size) {
 	EXIT_IF(size > Arena_sizeLeft(arena), "Arena is full");
 	void* ptr = (void*)arena->current;
 	arena->current += size;
-	if (Arena_sizeLeft(arena) < 64 * 1024)
+#ifndef NDEBUG
+	if (Arena_sizeLeft(arena) < arena->capacity * 0.95)
 		LOG_WARN("ARENA SIZE LEFT: %llu\n", Arena_sizeLeft(arena));
+#endif
 	return ptr;
 }
 

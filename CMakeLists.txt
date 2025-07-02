@@ -16,6 +16,7 @@ add_library(trait_runtime
         src/TraitRuntime/Commons/Callstack.h
         src/TraitRuntime/Commons/ErrorHandling.c
         src/TraitRuntime/Commons/ErrorHandling.h
+        src/TraitRuntime/Commons/Flags.h
         src/TraitRuntime/Commons/Log.c
         src/TraitRuntime/Commons/Log.h
         src/TraitRuntime/Commons/MacroUtils.h
@@ -30,6 +31,8 @@ add_library(trait_runtime
         src/TraitRuntime/Trait.c
         src/TraitRuntime/Trait.h
         src/TraitRuntime/Types.h
+        src/TraitRuntime/Container/HashTable.c
+        src/TraitRuntime/Container/HashTable.h
 )
 
 add_executable(demo

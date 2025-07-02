@@ -18,16 +18,14 @@ Class* clsVector3f;
 
 void Vector3f_initClass() {
 	clsVector3f = TR_CLASS("Vector3f", Data_Vector3f);
-	TraitImpl* traitImpl_Describe_Vector3f = TraitImpl_create(trDescribe.trait, clsVector3f);
-	TraitImpl_addMethod(traitImpl_Describe_Vector3f, trDescribe.methods.toString, MethodImpl_Vector3f_Describe_toString);
+	Class_implementMethod(clsVector3f, trDescribe.methods.toString, MethodImpl_Vector3f_Describe_toString);
+	Class_validateTrait(clsVector3f, trDescribe.trait);
 
-	TR_USE(TraitImpl, TraitImpl_create(trMove3f.trait, clsVector3f)) {
-		TraitImpl_addMethod(it, trMove3f.methods.move, MethodImpl_Move3f_Vector3f_move);
-		TraitImpl_addMethod(it, trMove3f.methods.moveX, MethodImpl_Move3f_Vector3f_moveX);
-		TraitImpl_addMethod(it, trMove3f.methods.moveY, MethodImpl_Move3f_Vector3f_moveY);
-		TraitImpl_addMethod(it, trMove3f.methods.moveZ, MethodImpl_Move3f_Vector3f_moveZ);
-	}
-
+	Class_implementMethod(clsVector3f, trMove3f.methods.move, MethodImpl_Move3f_Vector3f_move);
+	Class_implementMethod(clsVector3f, trMove3f.methods.moveX, MethodImpl_Move3f_Vector3f_moveX);
+	Class_implementMethod(clsVector3f, trMove3f.methods.moveY, MethodImpl_Move3f_Vector3f_moveY);
+	Class_implementMethod(clsVector3f, trMove3f.methods.moveZ, MethodImpl_Move3f_Vector3f_moveZ);
+	Class_validateTrait(clsVector3f, trMove3f.trait);
 }
 
 void* MethodImpl_Vector3f_Describe_toString(MethodContext* CTX) {

@@ -6,7 +6,7 @@
 typedef struct {
     Trait* trait;
     struct {
-        Method* toString;
+        MethodDef* toString;
     } methods;
 } Container_Describe;
 

@@ -24,13 +24,13 @@ typedef struct {
         struct {
             Trait* trait;
             struct {
-                Method* finalize;
+                MethodDef* finalize;
             } methods;
         } Finalizable;
         struct {
             Trait* trait;
             struct {
-                Method* construct;
+                MethodDef* construct;
             } methods;
         } Constructable;
     } traits;

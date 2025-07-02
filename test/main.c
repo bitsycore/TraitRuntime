@@ -113,10 +113,22 @@ int main() {
 	Point_initClass();
 	Vector3f_initClass();
 
+	const clock_t get_start = clock();
+	TR_REPEAT(9999) {
+		Class* point = Class_get(HASH_STR("Point"));
+		Class* vector3f = Class_get(HASH_STR("Vector3f"));
+		Class* uint32 = Class_get(HASH_STR("UInt32"));
+	}
+	const clock_t get_end = clock();
+	const double time_spent_get = (double)(get_end - start) / CLOCKS_PER_SEC;
+	LOG("Getters took %.5f ms\n", time_spent_get * 1000.0f);
+	// printf("POINT IS : %s", point->name.str);
+	// printf("VECTOR IS : %s", vector3f->name.str);
+	// printf("UInt32 IS : %s", uint32->name.str);
+
 	// =====================================================================
 	// Impl Traits for Uint64
-	TraitImpl* traitImpl_Describe_UInt64 = TraitImpl_create(trDescribe.trait, BuiltIn.classes.UInt64);
-	TraitImpl_addMethod(traitImpl_Describe_UInt64, trDescribe.methods.toString, MethodImpl_Describe_UInt64_toString);
+	Class_implementMethod(BuiltIn.classes.UInt64, trDescribe.methods.toString, MethodImpl_Describe_UInt64_toString);
 
 	const clock_t end = clock();
 	const double time_spent = (double)(end - start) / CLOCKS_PER_SEC;

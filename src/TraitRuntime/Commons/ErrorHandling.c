@@ -5,7 +5,7 @@
 #include "AlertDialog.h"
 #include "Callstack.h"
 
-void eh___handle_error(
+void INTERNAL_ErrorHandling_printError(
     const char *type_str,
     const char *file,
     const int line,

@@ -6,10 +6,10 @@
 typedef struct {
 	Trait* trait;
 	struct {
-		Method* move;
-		Method* moveX;
-		Method* moveY;
-		Method* moveZ;
+		MethodDef* move;
+		MethodDef* moveX;
+		MethodDef* moveY;
+		MethodDef* moveZ;
 	} methods;
 } Container_Move3f;
 

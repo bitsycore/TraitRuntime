@@ -5,12 +5,12 @@
 #include <stdlib.h>
 
 #include "Config.h"
-#include "TraitRuntime/Types.h"
-#include "TraitRuntime/Runtime.h"
-#include "TraitRuntime/Class.h"
-#include "TraitRuntime/Trait.h"
-#include "TraitRuntime/Object.h"
 #include "TraitRuntime/BuiltIn.h"
+#include "TraitRuntime/Class.h"
+#include "TraitRuntime/Object.h"
+#include "TraitRuntime/Runtime.h"
+#include "TraitRuntime/Trait.h"
+#include "TraitRuntime/Types.h"
 #include "TraitRuntime/Commons/ErrorHandling.h"
 #include "TraitRuntime/Commons/MacroUtils.h"
 #include "TraitRuntime/String/HashStr.h"
@@ -46,11 +46,11 @@
 #define TR_CHECK_TYPE(_type) \
 	EXIT_IF_NOT(Class_equal(Object_getClass(CTX->object), _type), "Class \"%s\" called this method expecting type \"%s\"", Object_getClass(CTX->object)->name.str, _type->name.str)
 #define TR_CHECK_TRAIT(_trait) \
-	EXIT_IF_NOT(Trait_equal(CTX->method->trait, _trait), "Class \"%s\" called this method expecting type \"%s\"", CTX->method->trait->name.str, _trait->name.str)
+	EXIT_IF_NOT(Trait_equal(CTX->method_def->trait, _trait), "Class \"%s\" called this method expecting type \"%s\"", CTX->method_def->trait->name.str, _trait->name.str)
 #define TR_CHECK_METHOD(_method) \
-	EXIT_IF_NOT(HashStr_equal(&CTX->method->name, &_method->name), "Method \"%s\" called but this method expect \"%s\"", CTX->method->name.str, _method->name.str)
+	EXIT_IF_NOT(HashStr_equal(&CTX->method_def->name, &_method->name), "Method \"%s\" called but this method expect \"%s\"", CTX->method_def->name.str, _method->name.str)
 #define TR_CHECK_METHOD_STR(_methodName) \
-	EXIT_IF_NOT(HashStr_equal(&CTX->method->name, &HASH_STR(_methodName)), "Method \"%s\" called but this method expect \"%s\"", CTX->method->name.str, _methodName)
+	EXIT_IF_NOT(HashStr_equal(&CTX->method_def->name, &HASH_STR(_methodName)), "Method \"%s\" called but this method expect \"%s\"", CTX->method_def->name.str, _methodName)
 
 #define TR_CHECK_ALL(_type, _trait, _method) \
 	TR_CHECK_TYPE(_type); TR_CHECK_TRAIT(_trait); TR_CHECK_METHOD(_method)
@@ -63,9 +63,9 @@
 	va_arg(*CTX->args, type); HIDDEN___count++\
 
 #define TR_METHOD_UNWRAP_END() \
-	EXIT_IF(HIDDEN___count != CTX->method->params_count, \
+	EXIT_IF(HIDDEN___count != CTX->method_def->params_count, \
 		"Arg count declarated for Method \"%s\" differt from param unwrapping count for impl of Class \"%s\"", \
-		CTX->method->name.str, Object_getClass(CTX->object)->name.str)
+		CTX->method_def->name.str, Object_getClass(CTX->object)->name.str)
 
 // =========================================
 // MARK: MACRO UTILITIES

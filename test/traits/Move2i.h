@@ -6,9 +6,9 @@
 typedef struct {
     Trait* trait;
     struct {
-        Method* move;
-        Method* moveX;
-        Method* moveY;
+        MethodDef* move;
+        MethodDef* moveX;
+        MethodDef* moveY;
     } methods;
 } Container_Move2i;
 
