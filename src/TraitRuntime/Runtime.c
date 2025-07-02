@@ -43,10 +43,21 @@ static void INTERNAL_initialize_built_in_traits_and_types(void) {
 	BuiltIn.classes.Int64	= Class_create(HASH_STR("Int64"), sizeof(int64_t));
 	BuiltIn.classes.Float32	= Class_create(HASH_STR("Float32"), sizeof(float));
 	BuiltIn.classes.Float64	= Class_create(HASH_STR("Float64"), sizeof(double));
+
+	FLAG_SET(BuiltIn.classes.UInt8->flags, CLASS_FLAG_IS_BUILTIN );
+	FLAG_SET(BuiltIn.classes.UInt16->flags, CLASS_FLAG_IS_BUILTIN );
+	FLAG_SET(BuiltIn.classes.UInt32->flags, CLASS_FLAG_IS_BUILTIN );
+	FLAG_SET(BuiltIn.classes.UInt64->flags, CLASS_FLAG_IS_BUILTIN );
+	FLAG_SET(BuiltIn.classes.Int8->flags, CLASS_FLAG_IS_BUILTIN );
+	FLAG_SET(BuiltIn.classes.Int16->flags, CLASS_FLAG_IS_BUILTIN );
+	FLAG_SET(BuiltIn.classes.Int32->flags, CLASS_FLAG_IS_BUILTIN );
+	FLAG_SET(BuiltIn.classes.Int64->flags, CLASS_FLAG_IS_BUILTIN );
+	FLAG_SET(BuiltIn.classes.Float32->flags, CLASS_FLAG_IS_BUILTIN );
+	FLAG_SET(BuiltIn.classes.Float64->flags, CLASS_FLAG_IS_BUILTIN );
 }
 
 void Runtime_init(const bool enable_builtin) {
-	const size_t arena_size = Arena_requiredSize(64*1024);
+	const size_t arena_size = Arena_requiredSize(64*1024*1024);
 	ARENA_GLOBAL = Arena_init(malloc(arena_size), arena_size);
 
 	IS_INIT = true;
@@ -57,7 +68,7 @@ void Runtime_init(const bool enable_builtin) {
 	INTERNAL_initialize_built_in_traits_and_types();
 }
 
-Arena* Runtime_getArena() {
+Arena* Internal_Runtime_getArena() {
 	return ARENA_GLOBAL;
 }
 

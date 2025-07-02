@@ -4,13 +4,15 @@
 #include "Types.h"
 #include "String/HashStr.h"
 
+#define CLASS_FLAG_IS_INIT    (1 << 0)
+#define CLASS_FLAG_IS_BUILTIN (1 << 1)
+
 // ===================================
 // Class
 Class* Class_create(HashStr name, size_t size);
 Class* Class_get(HashStr name);
-Class* Class_getById(ClassId id);
+
 bool Class_implement(const Class* clazz, const Trait* trait);
-bool ClassId_implement(ClassId, const Trait* trait);
 bool Class_equal(const Class* this, const Class* other);
 
 #endif //CLASS_H

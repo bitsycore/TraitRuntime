@@ -46,7 +46,7 @@
 #define TR_CHECK_TYPE(_type) \
 	EXIT_IF_NOT(Class_equal(Object_getClass(CTX->object), _type), "Class \"%s\" called this method expecting type \"%s\"", Object_getClass(CTX->object)->name.str, _type->name.str)
 #define TR_CHECK_TRAIT(_trait) \
-	EXIT_IF_NOT(Trait_equal(CTX->trait, _trait), "Class \"%s\" called this method expecting type \"%s\"", CTX->trait->name.str, _trait->name.str)
+	EXIT_IF_NOT(Trait_equal(CTX->method->trait, _trait), "Class \"%s\" called this method expecting type \"%s\"", CTX->method->trait->name.str, _trait->name.str)
 #define TR_CHECK_METHOD(_method) \
 	EXIT_IF_NOT(HashStr_equal(&CTX->method->name, &_method->name), "Method \"%s\" called but this method expect \"%s\"", CTX->method->name.str, _method->name.str)
 #define TR_CHECK_METHOD_STR(_methodName) \

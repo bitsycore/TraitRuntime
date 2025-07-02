@@ -4,31 +4,31 @@ project(TraitRuntime C)
 set(CMAKE_C_STANDARD 11)
 
 add_library(trait_runtime
+        src/Config.h
         src/TraitRuntime.h
-        src/TraitRuntime/String/HashStr.c
-        src/TraitRuntime/String/HashStr.h
-        src/TraitRuntime/Commons/ErrorHandling.h
+        src/TraitRuntime/BuiltIn.c
+        src/TraitRuntime/BuiltIn.h
+        src/TraitRuntime/Class.c
+        src/TraitRuntime/Class.h
+        src/TraitRuntime/Commons/AlertDialog.c
+        src/TraitRuntime/Commons/AlertDialog.h
         src/TraitRuntime/Commons/Callstack.c
         src/TraitRuntime/Commons/Callstack.h
-        src/TraitRuntime/Commons/Log.h
+        src/TraitRuntime/Commons/ErrorHandling.c
+        src/TraitRuntime/Commons/ErrorHandling.h
         src/TraitRuntime/Commons/Log.c
+        src/TraitRuntime/Commons/Log.h
         src/TraitRuntime/Commons/MacroUtils.h
         src/TraitRuntime/Memory/Arena.c
         src/TraitRuntime/Memory/Arena.h
-        src/TraitRuntime/Commons/AlertDialog.c
-        src/TraitRuntime/Commons/AlertDialog.h
-        src/TraitRuntime/Commons/ErrorHandling.c
-        src/TraitRuntime/Class.c
-        src/TraitRuntime/Class.h
         src/TraitRuntime/Object.c
         src/TraitRuntime/Object.h
-        src/TraitRuntime/Trait.c
-        src/TraitRuntime/Trait.h
-        src/Config.h
-        src/TraitRuntime/BuiltIn.c
-        src/TraitRuntime/BuiltIn.h
         src/TraitRuntime/Runtime.c
         src/TraitRuntime/Runtime.h
+        src/TraitRuntime/String/HashStr.c
+        src/TraitRuntime/String/HashStr.h
+        src/TraitRuntime/Trait.c
+        src/TraitRuntime/Trait.h
         src/TraitRuntime/Types.h
 )
 
@@ -49,7 +49,7 @@ add_executable(demo
 target_include_directories(trait_runtime PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_link_libraries(demo PRIVATE trait_runtime)
 
-# For TraitRuntime/Commons/Debug.c when on MSVC compiler
+# For TraitRuntime/Commons/Callstack.c when on MSVC compiler
 if (MSVC AND CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_link_libraries(trait_runtime PRIVATE Dbghelp)
-endif()
+endif ()

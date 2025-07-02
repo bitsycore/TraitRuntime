@@ -35,7 +35,7 @@ Trait* Trait_get(const HashStr name) {
 bool Trait_equal(const Trait* this, const Trait* other) {
 	if (this == NULL || other == NULL) return false;
 	if (this == other) return true;
-	if (HashStr_equal(&this->name, &other->name)) return true;
+	// if (HashStr_equal(&this->name, &other->name)) return true;
 	return false;
 }
 
@@ -90,7 +90,7 @@ TraitImpl* TraitImpl_create(Trait* trait, Class* clazz) {
 	return trait_impl;
 }
 
-void TraitImpl_addMethod(TraitImpl* trait_impl, const Method* method, const MethodImpl method_impl) {
+void TraitImpl_addMethod(TraitImpl* trait_impl, const Method* method, const MethodFunc method_impl) {
 	EXIT_IF(method == NULL, "param method cannot be NULL");
 	EXIT_IF(trait_impl == NULL, "param trait_impl cannot be NULL");
 	EXIT_IF(method_impl == NULL, "param method_impl cannot be NULL");
@@ -121,12 +121,12 @@ TraitImpl* TraitImpl_get(const Class* clazz, const Trait* trait) {
 	return NULL;
 }
 
-MethodImpl TraitImpl_getMethodImplStr(const TraitImpl* trait_impl, const HashStr method_name) {
+MethodFunc TraitImpl_getMethodImplStr(const TraitImpl* trait_impl, const HashStr method_name) {
 	EXIT_IF(trait_impl == NULL, "param trait_impl cannot be NULL");
 
 	for (size_t j = 0; j < trait_impl->trait->method_count; ++j) {
 		if (HashStr_equal(&trait_impl->trait->methods[j].name, &method_name) == true) {
-			const MethodImpl method_impl = trait_impl->methods[j];
+			const MethodFunc method_impl = trait_impl->methods[j];
 			if (method_impl == NULL) break;
 			return method_impl;
 		}
@@ -136,12 +136,12 @@ MethodImpl TraitImpl_getMethodImplStr(const TraitImpl* trait_impl, const HashStr
 	return NULL;
 }
 
-MethodImpl TraitImpl_getMethodImpl(const TraitImpl* trait_impl, const Method* method) {
+MethodFunc TraitImpl_getMethodImpl(const TraitImpl* trait_impl, const Method* method) {
 	EXIT_IF(trait_impl == NULL, "param trait_impl cannot be NULL");
 
 	for (size_t j = 0; j < trait_impl->trait->method_count; ++j) {
 		if (HashStr_equal(&trait_impl->trait->methods[j].name, &method->name) == true) {
-			const MethodImpl method_impl = trait_impl->methods[j];
+			const MethodFunc method_impl = trait_impl->methods[j];
 			if (method_impl == NULL) break;
 			return method_impl;
 		}

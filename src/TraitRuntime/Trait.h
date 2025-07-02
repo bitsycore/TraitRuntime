@@ -15,9 +15,9 @@ bool Trait_equal(const Trait* this, const Trait* other);
 // ===================================
 // TraitImpl
 TraitImpl* TraitImpl_create(Trait* trait, Class* clazz);
-void TraitImpl_addMethod(TraitImpl* trait_impl, const Method* method, MethodImpl method_impl);
+void TraitImpl_addMethod(TraitImpl* trait_impl, const Method* method, MethodFunc method_impl);
 TraitImpl* TraitImpl_get(const Class* clazz, const Trait* trait);
-MethodImpl TraitImpl_getMethodImplStr(const TraitImpl* trait_impl, HashStr method_name);
+MethodFunc TraitImpl_getMethodImplStr(const TraitImpl* trait_impl, HashStr method_name);
 TraitImpl* TraitImpl_getForMethodStr(Class* clazz, HashStr methodName);
 
 #endif //TRAIT_H

@@ -41,7 +41,7 @@ void* MethodImpl_Describe_UInt64_toString(MethodContext* CTX) {
 void printObjInfo(const Object* instance_point) {
 	const Class* type = Object_getClass(instance_point);
 	LOG("Object is of type: %s\n", type->name.str);
-	LOG("Object data size: %zu\n", type->size);
+	LOG("Object data size: %zu\n", type->data_size);
 	LOG("Point implement Describe = %d\n", Class_implement(type, trDescribe.trait));
 	LOG("Point implement Move2i = %d\n", Class_implement(type, trMove2i.trait));
 	LOG("Point implement Move3f = %d\n", Class_implement(type, trMove3f.trait));
