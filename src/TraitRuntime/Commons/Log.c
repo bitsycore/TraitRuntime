@@ -30,10 +30,10 @@ static void enableWindowsAnsiSupport() {
 
 static const char* levelToString(const LogLevel level) {
 	switch (level) {
-		case DEBUG: return BLUE "DEBUG" RESET;
-		case INFO: return GREEN "INFO" RESET;
-		case WARN: return YELLOW "WARN" RESET;
-		case _ERROR: return RED "ERROR" RESET;
+		case LOGTYPE_DEBUG: return BLUE "DEBUG" RESET;
+		case LOGTYPE_INFO: return GREEN "INFO" RESET;
+		case LOGTYPE_WARN: return YELLOW "WARN" RESET;
+		case LOGTYPE_ERROR: return RED "ERROR" RESET;
 		default: return NULL;
 	}
 }

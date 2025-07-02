@@ -37,7 +37,7 @@ static inline void* Arena_alloc(Arena *arena, const size_t size) {
 	void* ptr = (void*)arena->current;
 	arena->current += size;
 #ifndef NDEBUG
-	if (Arena_sizeLeft(arena) < arena->capacity * 0.95)
+	if (Arena_sizeLeft(arena) < arena->capacity * 0.33)
 		LOG_WARN("ARENA SIZE LEFT: %llu\n", Arena_sizeLeft(arena));
 #endif
 	return ptr;
