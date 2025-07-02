@@ -1,16 +1,19 @@
 #include "Object.h"
 
+#include "BuiltIn.h"
 #include "Class.h"
 #include "Trait.h"
+#include "TraitRuntime.h"
+#include "Commons/ErrorHandling.h"
 
 // =====================================
 // MARK: OBJECT
 // =====================================
 
-Object* Object_newFrom(const Class* type, void* data) {
-	EXIT_IF(type == NULL, "param type cannot be NULL");
+Object* Object_newFrom(Class* clazz, void* data) {
+	EXIT_IF(clazz == NULL, "param type cannot be NULL");
 	Object* obj = malloc(sizeof(Object));
-	obj->class_id = type->id;
+	obj->class = clazz;
 	obj->data = data;
 	if (Object_implement(obj, BuiltIn.traits.Constructable.trait)) {
 		Object_call(obj, BuiltIn.traits.Constructable.methods.construct);
@@ -18,21 +21,21 @@ Object* Object_newFrom(const Class* type, void* data) {
 	return obj;
 }
 
-Object* Object_new(const Class* type) {
-	EXIT_IF(type == NULL, "param type cannot be NULL");
-	return Object_newFrom(type, calloc(1, type->size));
+Object* Object_new(Class* clazz) {
+	EXIT_IF(clazz == NULL, "param type cannot be NULL");
+	return Object_newFrom(clazz, calloc(1, clazz->size));
 }
 
 MethodImpl Object_getMethodStr(const Object* obj, const HashStr trait_name, const HashStr method_name) {
 	EXIT_IF(obj == NULL, "param obj cannot be NULL");
 	const Trait* trait = Trait_get(trait_name);
-	const TraitImpl* impl = TraitImpl_get(obj->class_id, trait);
+	const TraitImpl* impl = TraitImpl_get(obj->class, trait);
 	return TraitImpl_getMethodImplStr(impl, method_name);
 }
 
 MethodImpl Object_getMethod(const Object* obj, const Method* method) {
 	EXIT_IF(obj == NULL, "param obj cannot be NULL");
-	return TraitImpl_getMethodImplStr(TraitImpl_get(obj->class_id, method->trait), method->name);
+	return TraitImpl_getMethodImplStr(TraitImpl_get(obj->class, method->trait), method->name);
 }
 
 static void* INTERNAL_Object_call(const Object* obj, const Method* trait_method, const Trait* trait, const TraitImpl* trait_impl, va_list* args) {
@@ -61,11 +64,11 @@ void* Object_callStr(const Object* obj, const HashStr method_name, ...) {
 	return result;
 }
 
-void* Object_callStrEx(const Object* obj, const HashStr trait_name, const HashStr method_name, ...) {
+void* Object_callTraitStr(const Object* obj, const HashStr trait_name, const HashStr method_name, ...) {
 	EXIT_IF(obj == NULL, "param obj cannot be NULL");
 
 	const Trait* trait = Trait_get(trait_name);
-	const TraitImpl* trait_impl = TraitImpl_get(obj->class_id, trait);
+	const TraitImpl* trait_impl = TraitImpl_get(obj->class, trait);
 	const Method* trait_method = Trait_getMethod(trait, method_name);
 
 	va_list args;
@@ -81,7 +84,7 @@ void* Object_call(const Object* obj, const Method* method, ...) {
 	EXIT_IF(method == NULL, "param method cannot be NULL");
 
 	const Trait* trait = (Trait*)method->trait;
-	const TraitImpl* trait_impl = TraitImpl_get(obj->class_id, trait);
+	const TraitImpl* trait_impl = TraitImpl_get(obj->class, trait);
 
 	va_list args;
 	va_start(args, method);
@@ -93,23 +96,23 @@ void* Object_call(const Object* obj, const Method* method, ...) {
 
 Class* Object_getClass(const Object* obj) {
 	EXIT_IF(obj == NULL, "param obj cannot be NULL");
-	return Class_getById(obj->class_id);
+	return obj->class;
 }
 
-bool Object_is(const Object* obj, const Class* type) {
-	if (obj == NULL || type == NULL) return false;
-	return obj->class_id == type->id;
+bool Object_is(const Object* obj, const Class* clazz) {
+	if (obj == NULL || clazz == NULL) return false;
+	return obj->class == clazz || obj->class->id == clazz->id;
 }
 
 bool Object_implement(const Object* obj, const Trait* trait) {
 	if (obj == NULL || trait == NULL) return false;
-	return Class_implementById(obj->class_id, trait);
+	return Class_implement(obj->class, trait);
 }
 
 void Object_destroy(Object* obj) {
 	if (obj == NULL) return;
 
-	if (BuiltIn.traits.Finalizable.trait != NULL && Class_implementById(obj->class_id, BuiltIn.traits.Finalizable.trait)) {
+	if (BuiltIn.traits.Finalizable.trait != NULL && Class_implement(obj->class, BuiltIn.traits.Finalizable.trait)) {
 		Object_call(obj, BuiltIn.traits.Finalizable.methods.finalize);
 	}
 

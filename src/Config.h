@@ -1,0 +1,13 @@
+#ifndef CONFIG_H
+#define CONFIG_H
+
+#define ENABLE_BUILTIN true
+
+#define MAX_TRAITS 32
+#define MAX_CLASSES 32
+#define MAX_TRAIT_IMPLS ((MAX_TRAITS / 2))
+
+#define MAX_METHODS_PER_TRAITS 8
+#define MAX_PARAMS_PER_METHODS 8
+
+#endif //CONFIG_H

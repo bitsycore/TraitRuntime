@@ -60,6 +60,6 @@ bool Class_implement(const Class* clazz, const Trait* trait) {
 	return false;
 }
 
-bool Class_implementById(const size_t id, const Trait* trait) {
+bool ClassId_implement(const size_t id, const Trait* trait) {
 	return Class_implement(Class_getById(id), trait);
 }

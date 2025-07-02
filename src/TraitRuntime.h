@@ -1,127 +1,28 @@
 #ifndef TRAIT_RUNTIME_H
 #define TRAIT_RUNTIME_H
 
-#include <assert.h>
 #include <stdarg.h>
-#include <stdio.h>
 #include <stdlib.h>
 
+#include "Config.h"
+#include "TraitRuntime/Types.h"
+#include "TraitRuntime/Runtime.h"
+#include "TraitRuntime/Class.h"
+#include "TraitRuntime/Trait.h"
+#include "TraitRuntime/Object.h"
+#include "TraitRuntime/BuiltIn.h"
 #include "TraitRuntime/Commons/ErrorHandling.h"
 #include "TraitRuntime/Commons/MacroUtils.h"
 #include "TraitRuntime/String/HashStr.h"
 
-#define ENABLE_BUILTIN true
-
-#define MAX_TRAITS 32
-#define MAX_CLASSES 32
-#define MAX_TRAIT_IMPLS ((MAX_TRAITS / 2))
-
-#define MAX_METHODS_PER_TRAITS 8
-#define MAX_PARAMS_PER_METHODS 8
-
-struct Class;
-struct Object;
-struct Trait;
-struct TraitImpl;
-struct Method;
-struct MethodContext;
-
-typedef size_t TraitId;
-typedef size_t ClassId;
-
-typedef struct Object {
-	ClassId class_id;
-	void* data;
-} Object;
-
-typedef struct Method {
-	HashStr name;
-	HashStr params[MAX_PARAMS_PER_METHODS];
-	size_t params_count;
-	size_t param_vararg_at;
-	struct Trait* trait;
-} Method;
-
-typedef struct Trait {
-	TraitId id;
-	HashStr name;
-	Method methods[MAX_METHODS_PER_TRAITS];
-	size_t method_count;
-	size_t data_size;
-} Trait;
-
-typedef struct MethodContext {
-	const Object* object;
-	const Trait* trait;
-	const Method* method;
-	va_list* args;
-} MethodContext;
-
-typedef void* (*MethodImpl)(MethodContext* CTX);
-
-typedef struct TraitImpl {
-	Trait* trait;
-	MethodImpl methods[MAX_METHODS_PER_TRAITS];
-} TraitImpl;
-
-typedef struct Class {
-	HashStr name;
-	size_t id;
-	size_t size;
-	size_t trait_impl_count;
-	TraitImpl traits_impl[MAX_TRAIT_IMPLS];
-} Class;
-
-// ===================================
-// General
-void TraitRuntime_init(bool enable_builtin);
-void TraitRuntime_clean();
-
-// ======================================================================================
-// BUILT IN TYPE
-// ======================================================================================
-
-typedef struct {
-	struct {
-		Class* UInt8;
-		Class* UInt16;
-		Class* UInt32;
-		Class* UInt64;
-		Class* Int8;
-		Class* Int16;
-		Class* Int32;
-		Class* Int64;
-		Class* Float32;
-		Class* Float64;
-	} classes;
-	struct {
-		struct {
-			Trait* trait;
-			struct {
-				Method* finalize;
-			} methods;
-		} Finalizable;
-		struct {
-			Trait* trait;
-			struct {
-				Method* construct;
-			} methods;
-		} Constructable;
-	} traits;
-} Container_BuiltIn;
-
-extern Container_BuiltIn BuiltIn;
-
 // =========================================
-// SUGAR
+// MARK: MACRO SUGAR
 // =========================================
 
-#define TR_INIT() TraitRuntime_init(ENABLE_BUILTIN)
+#define TR_INIT() Runtime_init(ENABLE_BUILTIN)
+
 #define TR_CLASS(name, data) Class_create(HASH_STR(name), sizeof(data))
-
-#define _______TR_TRAIT_1(name, ...) Trait_create(HASH_STR(name), 0)
-#define _______TR_TRAIT_2(name, type) Trait_create(HASH_STR(name), sizeof(type))
-#define TR_TRAIT(name, ...) MU_GET_MACRO_2(_, ##__VA_ARGS__, _______TR_TRAIT_2, _______TR_TRAIT_1)(name, __VA_ARGS__)
+#define TR_TRAIT(name) Trait_create(HASH_STR(name))
 
 #define TR_TRAIT_ADD_METHOD(trait, method_name, ...) Trait_addMethod(trait, HASH_STR(method_name), TR_PARAMS(__VA_ARGS__))
 #define TR_PARAMS(...) MU_COUNT_ARGS(__VA_ARGS__) == 0 ? NULL : (HashStr[]){ __VA_OPT__(MU_MAP(HASH_STR, __VA_ARGS__)) } , MU_COUNT_ARGS(__VA_ARGS__)
@@ -131,10 +32,10 @@ extern Container_BuiltIn BuiltIn;
 #define TR_TRAIT_IMPL_METHOD(traitImpl, methodName, fn) TraitImpl_addMethod(traitImpl, Trait_getMethod(traitImpl->trait, HASH_STR(methodName)), fn)
 
 #define TR_OBJ_CALL(obj, methodName, ...) Object_callStr(obj, HASH_STR(methodName) __VA_OPT__(,) __VA_ARGS__)
-#define TR_OBJ_CALL_EX(obj, traitName, methodName, ...) Object_callStrEx(obj, HASH_STR(traitName), HASH_STR(methodName) __VA_OPT__(,) __VA_ARGS__)
+#define TR_OBJ_TRAIT_CALL(obj, traitName, methodName, ...) Object_callTraitStr(obj, HASH_STR(traitName), HASH_STR(methodName) __VA_OPT__(,) __VA_ARGS__)
 
 // =========================================
-// METHOD DEFINITION
+// MARK: METHODS SUGAR
 // =========================================
 
 #define TR_METHOD_UNWRAP_START() \
@@ -167,7 +68,7 @@ extern Container_BuiltIn BuiltIn;
 		CTX->method->name.str, Object_getClass(CTX->object)->name.str)
 
 // =========================================
-// MACRO UTILITIES
+// MARK: MACRO UTILITIES
 // =========================================
 
 #define TR_USE(T, traitName) for (T * it = traitName; it != NULL; it = NULL)

@@ -3,7 +3,7 @@
 #include <string.h>
 
 #include "Class.h"
-#include "TraitRuntime.h"
+#include "Commons/ErrorHandling.h"
 
 Trait POOL_TRAITS[MAX_TRAITS] = {0};
 size_t POOL_TRAITS_COUNT = 0;
@@ -12,11 +12,10 @@ size_t POOL_TRAITS_COUNT = 0;
 // MARK: TRAIT
 // =====================================
 
-Trait* Trait_create(const HashStr name, const size_t data_size) {
+Trait* Trait_create(const HashStr name) {
 	EXIT_IF_NOT(POOL_TRAITS_COUNT < MAX_TRAITS, "Can't add Trait \"%s\", Max number of Trait created in TraitRuntime", name.str);
 	Trait* trait = &POOL_TRAITS[POOL_TRAITS_COUNT];
 	trait->name = name;
-	trait->data_size = data_size;
 	trait->id = POOL_TRAITS_COUNT;
 	POOL_TRAITS_COUNT++;
 	return trait;
@@ -108,19 +107,17 @@ void TraitImpl_addMethod(TraitImpl* trait_impl, const Method* method, const Meth
 	EXIT("Method \"%s\" not found in Trait \"%s\"", method->name.str, trait_impl->trait->name.str);
 }
 
-TraitImpl* TraitImpl_get(const size_t type_id, const Trait* trait) {
+TraitImpl* TraitImpl_get(const Class* clazz, const Trait* trait) {
 	EXIT_IF(trait == NULL, "param trait cannot be NULL");
 
-	Class* clazz = Class_getById(type_id);
-
 	for (size_t i = 0; i < clazz->trait_impl_count; ++i) {
-		TraitImpl* impl = &clazz->traits_impl[i];
+		TraitImpl* impl = (TraitImpl*) &clazz->traits_impl[i];
 		if (Trait_equal(impl->trait, trait)) {
 			return impl;
 		}
 	}
 
-	EXIT("No implementation of Trait \"%s\" found for Class \"%s\"", trait->name.str, Class_getById(type_id)->name.str);
+	EXIT("No implementation of Trait \"%s\" found for Class \"%s\"", trait->name.str, clazz->name.str);
 	return NULL;
 }
 

@@ -5,14 +5,12 @@
 
 #include <TraitRuntime.h>
 #include <TraitRuntime/Commons/Log.h>
+
+#include "classes/Point.h"
+#include "classes/Vector3f.h"
 #include "traits/Describe.h"
 #include "traits/Move2i.h"
 #include "traits/Move3f.h"
-#include "classes/Point.h"
-#include "classes/Vector3f.h"
-#include "TraitRuntime/Class.h"
-#include "TraitRuntime/Object.h"
-#include "TraitRuntime/Trait.h"
 
 // ===========================================================
 // Using Any Describe
@@ -34,9 +32,9 @@ void* MethodImpl_Describe_UInt64_toString(MethodContext* CTX) {
 	TR_CHECK_ALL_STR("UInt64", "Describe", "toString");
 	TR_METHOD_UNWRAP_END();
 	const char* template = "%s(%llu)";
-	const int len = snprintf(NULL, 0, template, Class_getById(CTX->object->class_id)->name.str, this);
+	const int len = snprintf(NULL, 0, template, CTX->object->class->name.str, this);
 	char* buf = malloc(len + 1);
-	snprintf(buf, len + 1, template, Class_getById(CTX->object->class_id)->name.str, this);
+	snprintf(buf, len + 1, template, CTX->object->class->name.str, this);
 	return buf;
 }
 
@@ -69,10 +67,10 @@ void do_work(void) {
 	LINE_BREAK();
 
 	Describe_print(instance_point);
-	TR_OBJ_CALL_EX(instance_point, "Move2i", "move", 3, 2);
-	TR_OBJ_CALL_EX(instance_point, "Move2i", "moveX", -12);
-	TR_OBJ_CALL_EX(instance_point, "Move2i", "moveY", 33);
-	TR_OBJ_CALL_EX(instance_point, "Move2i", "moveY", 123);
+	TR_OBJ_TRAIT_CALL(instance_point, "Move2i", "move", 3, 2);
+	TR_OBJ_TRAIT_CALL(instance_point, "Move2i", "moveX", -12);
+	TR_OBJ_TRAIT_CALL(instance_point, "Move2i", "moveY", 33);
+	TR_OBJ_TRAIT_CALL(instance_point, "Move2i", "moveY", 123);
 	Describe_print(instance_point);
 	TR_OBJ_CALL(instance_point, "move", 3, 2);
 	TR_OBJ_CALL(instance_point, "moveX", -12);
@@ -136,6 +134,6 @@ int main() {
 
 	// =====================================================================
 	// Clean Runtime
-	TraitRuntime_clean();
+	Runtime_clean();
 	return 0;
 }

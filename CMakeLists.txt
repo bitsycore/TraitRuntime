@@ -4,7 +4,6 @@ project(TraitRuntime C)
 set(CMAKE_C_STANDARD 11)
 
 add_library(trait_runtime
-        src/TraitRuntime.c
         src/TraitRuntime.h
         src/TraitRuntime/String/HashStr.c
         src/TraitRuntime/String/HashStr.h
@@ -25,6 +24,12 @@ add_library(trait_runtime
         src/TraitRuntime/Object.h
         src/TraitRuntime/Trait.c
         src/TraitRuntime/Trait.h
+        src/Config.h
+        src/TraitRuntime/BuiltIn.c
+        src/TraitRuntime/BuiltIn.h
+        src/TraitRuntime/Runtime.c
+        src/TraitRuntime/Runtime.h
+        src/TraitRuntime/Types.h
 )
 
 add_executable(demo
